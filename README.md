@@ -5,6 +5,8 @@ by long pressing an item in your list, then you drag your finger without letting
 
 You can [download a sample APK](https://github.com/afollestad/drag-select-recyclerview/raw/master/sample/sample.apk)!
 
+![Art](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/dsrvart.png)
+
 ---
 
 # Gradle Dependency
