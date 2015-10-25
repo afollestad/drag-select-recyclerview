@@ -10,17 +10,19 @@ import android.view.MenuItem;
 
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerView;
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
+import com.afollestad.dragselectrecyclerview.DragSelectionListener;
 import com.afollestad.materialcab.MaterialCab;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
 public class MainActivity extends AppCompatActivity implements
-        MainAdapter.ClickListener, DragSelectRecyclerViewAdapter.SelectionListener, MaterialCab.Callback {
+        MainAdapter.ClickListener, DragSelectionListener, MaterialCab.Callback {
 
-    private DragSelectRecyclerView mList;
-    private MainAdapter mAdapter;
     private MaterialCab mCab;
+
+    private DragSelectRecyclerViewAdapter mDragSelectRecyclerViewAdapter;
+    private DragSelectRecyclerView mDragSelectRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,35 +31,40 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
 
         // Setup adapter and callbacks
-        mAdapter = new MainAdapter(this);
-        mAdapter.setSelectionListener(this);
-        // Restore selected indices after Activity recreation
-        mAdapter.restoreInstanceState(savedInstanceState);
+        final MainAdapter adapter = new MainAdapter(this);
+        adapter.setSelectionListener(this);
+        mDragSelectRecyclerViewAdapter = adapter;
 
         // Setup the RecyclerView
-        mList = (DragSelectRecyclerView) findViewById(R.id.list);
-        mList.setLayoutManager(new GridLayoutManager(this, getResources().getInteger(R.integer.grid_width)));
-        mList.setAdapter(mAdapter);
+        final MainRecyclerView list = (MainRecyclerView) findViewById(R.id.list);
+        list.setLayoutManager(new GridLayoutManager(this, getResources().getInteger(R.integer.grid_width)));
+        list.setAdapter(adapter);
+        mDragSelectRecyclerView = list;
 
-        mCab = MaterialCab.restoreState(savedInstanceState, this, this);
+        if (savedInstanceState != null) {
+            // Restore selected indices after Activity recreation
+            adapter.restoreInstanceState(savedInstanceState);
+
+            mCab = MaterialCab.restoreState(savedInstanceState, this, this);
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         // Save selected indices
-        mAdapter.saveInstanceState(outState);
+        mDragSelectRecyclerViewAdapter.saveInstanceState(outState);
         if (mCab != null) mCab.saveState(outState);
     }
 
     @Override
     public void onClick(int index) {
-        mAdapter.toggleSelected(index);
+        mDragSelectRecyclerViewAdapter.toggleSelected(index);
     }
 
     @Override
     public void onLongClick(int index) {
-        mList.setDragSelectActive(true, index);
+        mDragSelectRecyclerView.setDragSelectActive(true, index);
     }
 
     @Override
@@ -86,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCabFinished(MaterialCab cab) {
-        mAdapter.clearSelected();
+        mDragSelectRecyclerViewAdapter.clearSelected();
         return true;
     }
 }
