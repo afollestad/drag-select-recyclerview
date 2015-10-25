@@ -5,7 +5,7 @@ by long pressing an item in your list, then you drag your finger without letting
 
 You can [download a sample APK](https://github.com/afollestad/drag-select-recyclerview/raw/master/sample/sample.apk)!
 
-![Art](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/dsrvart.png)
+![Art](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/showcase.gif)
 
 ---
 
@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     // ...
-    compile('com.afollestad:drag-select-recyclerview:0.1.0@aar') {
+    compile('com.afollestad:drag-select-recyclerview:0.1.1@aar') {
         transitive = true
     }
 }
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Setup adapter and callbacks
         mAdapter = new MainAdapter(this);
-        // Listen for selection changes to update indicators
+        // Receives selection updates, recommended to set before restoreInstanceState() so initial reselection is received
         mAdapter.setSelectionListener(this);
         // Restore selected indices after Activity recreation
         mAdapter.restoreInstanceState(savedInstanceState);

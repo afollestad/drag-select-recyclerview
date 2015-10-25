@@ -81,6 +81,10 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
         mCallback = callback;
     }
 
+    public String getItem(int index) {
+        return ALPHABET[index];
+    }
+
     @Override
     public MainViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.griditem_main, parent, false);
@@ -89,7 +93,7 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
 
     @Override
     public void onBindViewHolder(MainViewHolder holder, int position) {
-        holder.label.setText(ALPHABET[position]);
+        holder.label.setText(getItem(position));
 
         final Drawable d;
         final Context c = holder.itemView.getContext();

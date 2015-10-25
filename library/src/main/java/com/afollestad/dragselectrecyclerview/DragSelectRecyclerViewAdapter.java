@@ -43,6 +43,7 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
             //noinspection unchecked
             mSelectedIndices = (ArrayList<Integer>) in.getSerializable("selected_indices");
             if (mSelectedIndices == null) mSelectedIndices = new ArrayList<>();
+            else fireSelectionListener();
         }
     }
 
@@ -56,6 +57,7 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
             mSelectedIndices.remove(index);
             notifyItemChanged(index);
         }
+        fireSelectionListener();
     }
 
     public final boolean toggleSelected(int index) {

@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerView;
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Setup adapter and callbacks
         mAdapter = new MainAdapter(this);
+        // Receives selection updates, recommended to set before restoreInstanceState() so initial reselection is received
         mAdapter.setSelectionListener(this);
         // Restore selected indices after Activity recreation
         mAdapter.restoreInstanceState(savedInstanceState);
@@ -63,8 +65,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onDragSelectionChanged(int count) {
         if (count > 0) {
-            if (mCab == null)
-                mCab = new MaterialCab(this, R.id.cab_stub).start(this);
+            if (mCab == null) {
+                mCab = new MaterialCab(this, R.id.cab_stub)
+                        .setMenu(R.menu.cab)
+                        .setCloseDrawableRes(R.drawable.ic_close)
+                        .start(this);
+            }
             mCab.setTitleRes(R.string.cab_title_x, count);
         } else if (mCab != null && mCab.isActive()) {
             mCab.reset().finish();
@@ -81,7 +87,25 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCabItemClicked(MenuItem item) {
+        if (item.getItemId() == R.id.done) {
+            StringBuilder sb = new StringBuilder();
+            for (int index : mAdapter.getSelectedIndices()) {
+                if (index > 0) sb.append(", ");
+                sb.append(mAdapter.getItem(index));
+            }
+            Toast.makeText(this,
+                    String.format("Selected letters (%d): %s", mAdapter.getSelectedCount(), sb.toString()),
+                    Toast.LENGTH_LONG).show();
+            mAdapter.clearSelected();
+        }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mAdapter.getSelectedCount() > 0)
+            mAdapter.clearSelected();
+        else super.onBackPressed();
     }
 
     @Override
