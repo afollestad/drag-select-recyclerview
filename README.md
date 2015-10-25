@@ -27,6 +27,8 @@ dependencies {
 }
 ```
 
+[![Release](https://img.shields.io/github/release/afollestad/drag-select-recyclerview.svg?label=jitpack)](https://jitpack.io/#afollestad/drag-select-recyclerview)
+
 ---
 
 # Tutorial
