@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -154,10 +156,18 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
     }
 
     public final Integer[] getSelectedIndices() {
+        Collections.sort(mSelectedIndices, new IndexSorter());
         return mSelectedIndices.toArray(new Integer[mSelectedIndices.size()]);
     }
 
     public final boolean isIndexSelected(int index) {
         return mSelectedIndices.contains(index);
+    }
+
+    public class IndexSorter implements Comparator<Integer> {
+        @Override
+        public int compare(Integer lhs, Integer rhs) {
+            return lhs < rhs ? -1 : (lhs.intValue() == rhs.intValue() ? 0 : 1);
+        }
     }
 }

@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     // ...
-    compile('com.afollestad:drag-select-recyclerview:0.1.1@aar') {
+    compile('com.afollestad:drag-select-recyclerview:0.1.2@aar') {
         transitive = true
     }
 }
