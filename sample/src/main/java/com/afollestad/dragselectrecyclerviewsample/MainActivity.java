@@ -89,9 +89,11 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCabItemClicked(MenuItem item) {
         if (item.getItemId() == R.id.done) {
             StringBuilder sb = new StringBuilder();
-            for (int index : mAdapter.getSelectedIndices()) {
-                if (index > 0) sb.append(", ");
+            int traverse = 0;
+            for (Integer index : mAdapter.getSelectedIndices()) {
+                if (traverse > 0) sb.append(", ");
                 sb.append(mAdapter.getItem(index));
+                traverse++;
             }
             Toast.makeText(this,
                     String.format("Selected letters (%d): %s", mAdapter.getSelectedCount(), sb.toString()),
