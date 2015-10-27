@@ -3,9 +3,17 @@
 This library allows you to implement Google Photos style multi-selection in your apps! You start
 by long pressing an item in your list, then you drag your finger without letting go to select more.
 
-You can [download a sample APK](https://github.com/afollestad/drag-select-recyclerview/raw/master/sample/sample.apk)!
-
 ![Art](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/showcase.gif)
+
+# Sample
+
+You can [download a sample APK](https://github.com/afollestad/drag-select-recyclerview/raw/master/sample/sample.apk) or 
+[view it on Google Play](https://play.google.com/store/apps/details?id=com.afollestad.dragselectrecyclerviewsample)!
+
+<a href="https://play.google.com/store/apps/details?id=com.afollestad.dragselectrecyclerviewsample">
+  <img alt="Get it on Google Play"
+       src="https://developer.android.com/images/brand/en_generic_rgb_wo_45.png" />
+</a>
 
 ---
 
