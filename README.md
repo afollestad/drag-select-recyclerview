@@ -43,11 +43,15 @@ dependencies {
 
 1. [Introduction](https://github.com/afollestad/drag-select-recyclerview#introduction)
 2. [DragSelectRecyclerView](https://github.com/afollestad/drag-select-recyclerview#dragselectrecyclerview)
+    1. How to create a DragSelectRecyclerView in your layout. How to set it up from code.
 3. [DragSelectRecyclerViewAdapter](https://github.com/afollestad/drag-select-recyclerview#dragselectrecyclerviewadapter)
     1. An example of how adapter's should be setup. Goes over how to know which items are selected, how to prevent certain items from being selected, etc.
 4. [User Activation, Initializing Drag Selection](https://github.com/afollestad/drag-select-recyclerview#user-activation-initializing-drag-selection)
+    1. How drag selection mode is activated by a long press. How to maintain selected items through configuration changes, etc. 
 5. [Selection Retrieval and Modification](https://github.com/afollestad/drag-select-recyclerview#selection-retrieval-and-modification)
+    1. How to retrieve selected indices and modify them.
 6. [Auto Scroll](https://github.com/afollestad/drag-select-recyclerview#auto-scroll)
+    1. By default, this library will auto-scroll up or down if the user holds their finger at the top or bottom of the list during selection mode.
 
 ---
 
