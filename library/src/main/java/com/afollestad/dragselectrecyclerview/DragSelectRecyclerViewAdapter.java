@@ -1,6 +1,7 @@
 package com.afollestad.dragselectrecyclerview;
 
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -48,13 +49,15 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
     }
 
     public final void setSelected(int index, boolean selected) {
+        if (!isIndexSelectable(index))
+            selected = false;
         if (selected) {
             if (!mSelectedIndices.contains(index)) {
                 mSelectedIndices.add(index);
                 notifyItemChanged(index);
             }
         } else if (mSelectedIndices.contains(index)) {
-            mSelectedIndices.remove(index);
+            mSelectedIndices.remove((Integer) index);
             notifyItemChanged(index);
         }
         fireSelectionListener();
@@ -62,15 +65,27 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
 
     public final boolean toggleSelected(int index) {
         boolean selectedNow = false;
-        if (mSelectedIndices.contains(index)) {
-            mSelectedIndices.remove((Integer) index);
-        } else {
-            mSelectedIndices.add(index);
-            selectedNow = true;
+        if (isIndexSelectable(index)) {
+            if (mSelectedIndices.contains(index)) {
+                mSelectedIndices.remove((Integer) index);
+            } else {
+                mSelectedIndices.add(index);
+                selectedNow = true;
+            }
+            notifyItemChanged(index);
         }
-        notifyItemChanged(index);
         fireSelectionListener();
         return selectedNow;
+    }
+
+    protected boolean isIndexSelectable(int index) {
+        return true;
+    }
+
+    @CallSuper
+    @Override
+    public void onBindViewHolder(VH holder, int position) {
+        holder.itemView.setTag(holder);
     }
 
     public final void selectRange(int from, int to, int min, int max) {
@@ -89,55 +104,33 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
 
         if (to < from) {
             // When selecting from one to previous items
-            for (int i = to; i <= from; i++) {
-                if (!mSelectedIndices.contains(i)) {
-                    mSelectedIndices.add(i);
-                    notifyItemChanged(i);
-                }
-            }
+            for (int i = to; i <= from; i++)
+                setSelected(i, true);
             if (min > -1 && min < to) {
                 // Unselect items that were selected during this drag but no longer are
                 for (int i = min; i < to; i++) {
                     if (i == from) continue;
-                    if (mSelectedIndices.contains(i)) {
-                        mSelectedIndices.remove((Integer) i);
-                        notifyItemChanged(i);
-                    }
+                    setSelected(i, false);
                 }
             }
             if (max > -1) {
-                for (int i = from + 1; i <= max; i++) {
-                    if (mSelectedIndices.contains(i)) {
-                        mSelectedIndices.remove((Integer) i);
-                        notifyItemChanged(i);
-                    }
-                }
+                for (int i = from + 1; i <= max; i++)
+                    setSelected(i, false);
             }
         } else {
             // When selecting from one to next items
-            for (int i = from; i <= to; i++) {
-                if (!mSelectedIndices.contains(i)) {
-                    mSelectedIndices.add(i);
-                    notifyItemChanged(i);
-                }
-            }
+            for (int i = from; i <= to; i++)
+                setSelected(i, true);
             if (max > -1 && max > to) {
                 // Unselect items that were selected during this drag but no longer are
                 for (int i = to + 1; i <= max; i++) {
                     if (i == from) continue;
-                    if (mSelectedIndices.contains(i)) {
-                        mSelectedIndices.remove((Integer) i);
-                        notifyItemChanged(i);
-                    }
+                    setSelected(i, false);
                 }
             }
             if (min > -1) {
-                for (int i = min; i < from; i++) {
-                    if (mSelectedIndices.contains(i)) {
-                        mSelectedIndices.remove((Integer) i);
-                        notifyItemChanged(i);
-                    }
-                }
+                for (int i = min; i < from; i++)
+                    setSelected(i, false);
             }
         }
         fireSelectionListener();

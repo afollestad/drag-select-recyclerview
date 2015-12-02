@@ -16,6 +16,7 @@ import com.afollestad.library.R;
  */
 public class DragSelectRecyclerView extends RecyclerView {
 
+    private static final boolean LOGGING = false;
     private static final int AUTO_SCROLL_DELAY = 25;
 
     public DragSelectRecyclerView(Context context) {
@@ -34,10 +35,12 @@ public class DragSelectRecyclerView extends RecyclerView {
     }
 
     private static void LOG(String message, Object... args) {
+        //noinspection PointlessBooleanExpression
+        if (!LOGGING) return;
         if (args != null) {
-            Log.d("DragSelectRecyculerView", String.format(message, args));
+            Log.d("DragSelectRecyclerView", String.format(message, args));
         } else {
-            Log.d("DragSelectRecyculerView", message);
+            Log.d("DragSelectRecyclerView", message);
         }
     }
 
@@ -91,13 +94,19 @@ public class DragSelectRecyclerView extends RecyclerView {
     }
 
     public void setDragSelectActive(boolean active, int initialSelection) {
-        mAdapter.setSelected(initialSelection, true);
         mLastDraggedIndex = -1;
+        mMinReached = -1;
+        mMaxReached = -1;
+        if (!mAdapter.isIndexSelectable(initialSelection)) {
+            mDragSelectActive = false;
+            mInitialSelection = -1;
+            mLastDraggedIndex = -1;
+            return;
+        }
+        mAdapter.setSelected(initialSelection, true);
         mDragSelectActive = active;
         mInitialSelection = initialSelection;
         mLastDraggedIndex = initialSelection;
-        mMinReached = -1;
-        mMaxReached = -1;
     }
 
     /**
@@ -135,9 +144,19 @@ public class DragSelectRecyclerView extends RecyclerView {
         }
     };
 
+    private int getItemPosition(MotionEvent e) {
+        final View v = findChildViewUnder(e.getX(), e.getY());
+        if (v == null) return -1;
+        if (v.getTag() == null || !(v.getTag() instanceof ViewHolder))
+            throw new IllegalStateException("Make sure your adapter makes a call to super.onBindViewHolder(), and doesn't override itemView tags.");
+        final ViewHolder holder = (ViewHolder) v.getTag();
+        return holder.getAdapterPosition();
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
         if (mDragSelectActive) {
+            final int itemPosition = getItemPosition(e);
             if (e.getAction() == MotionEvent.ACTION_UP) {
                 mDragSelectActive = false;
                 mInTopHotspot = false;
@@ -145,6 +164,7 @@ public class DragSelectRecyclerView extends RecyclerView {
                 mAutoScrollHandler.removeCallbacks(mAutoScrollRunnable);
                 return true;
             } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
+                // Check for auto-scroll hotspot
                 if (mHotspotHeight > -1) {
                     if (e.getY() <= mHotspotTopBound) {
                         mInBottomHotspot = false;
@@ -174,9 +194,9 @@ public class DragSelectRecyclerView extends RecyclerView {
                     }
                 }
 
-                View v = findChildViewUnder(e.getX(), e.getY());
-                if (v != null && mLastDraggedIndex != (Integer) v.getTag()) {
-                    mLastDraggedIndex = (Integer) v.getTag();
+                // Drag selection logic
+                if (mLastDraggedIndex != itemPosition) {
+                    mLastDraggedIndex = itemPosition;
                     if (mMinReached == -1) mMinReached = mLastDraggedIndex;
                     if (mMaxReached == -1) mMaxReached = mLastDraggedIndex;
                     if (mLastDraggedIndex > mMaxReached)

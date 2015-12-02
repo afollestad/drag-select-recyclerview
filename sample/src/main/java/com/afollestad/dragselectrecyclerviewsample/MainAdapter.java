@@ -17,8 +17,7 @@ import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHolder>
-        implements View.OnClickListener, View.OnLongClickListener {
+public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHolder> {
 
     private final static String[] ALPHABET = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split(" ");
     private final static int[] COLORS = new int[]{
@@ -50,24 +49,6 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
             Color.parseColor("#03A9F4")
     };
 
-    @Override
-    public void onClick(View v) {
-        if (v.getTag() != null) {
-            int index = (int) v.getTag();
-            if (mCallback != null) mCallback.onClick(index);
-        }
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        if (v.getTag() != null) {
-            int index = (int) v.getTag();
-            if (mCallback != null) mCallback.onLongClick(index);
-            return true;
-        }
-        return false;
-    }
-
     public interface ClickListener {
         void onClick(int index);
 
@@ -92,7 +73,14 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
     }
 
     @Override
+    protected boolean isIndexSelectable(int index) {
+        return index != 4;
+    }
+
+    @Override
     public void onBindViewHolder(MainViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
+
         holder.label.setText(getItem(position));
 
         final Drawable d;
@@ -109,10 +97,6 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
         //noinspection RedundantCast
         ((FrameLayout) holder.colorSquare).setForeground(d);
         holder.colorSquare.setBackgroundColor(COLORS[position]);
-
-        holder.itemView.setTag(position);
-        holder.itemView.setOnClickListener(this);
-        holder.itemView.setOnLongClickListener(this);
     }
 
     @Override
@@ -120,7 +104,8 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
         return ALPHABET.length;
     }
 
-    public class MainViewHolder extends RecyclerView.ViewHolder {
+    public class MainViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
 
         public final TextView label;
         public final RectangleView colorSquare;
@@ -129,6 +114,21 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
             super(itemView);
             this.label = (TextView) itemView.findViewById(R.id.label);
             this.colorSquare = (RectangleView) itemView.findViewById(R.id.colorSquare);
+            this.itemView.setOnClickListener(this);
+            this.itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mCallback != null)
+                mCallback.onClick(getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (mCallback != null)
+                mCallback.onLongClick(getAdapterPosition());
+            return true;
         }
     }
 }
