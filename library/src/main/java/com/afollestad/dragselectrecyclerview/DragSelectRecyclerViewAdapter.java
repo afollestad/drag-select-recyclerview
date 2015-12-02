@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -19,7 +17,6 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
     private ArrayList<Integer> mSelectedIndices;
     private SelectionListener mSelectionListener;
     private int mLastCount = -1;
-    private boolean mGoingBack;
 
     private void fireSelectionListener() {
         if (mLastCount == mSelectedIndices.size())
@@ -77,7 +74,6 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
     }
 
     public final void selectRange(int from, int to, int min, int max) {
-        mGoingBack = to < from;
         if (from == to) {
             // Finger is back on the initial item, unselect everything else
             for (int i = min; i <= max; i++) {
@@ -158,29 +154,10 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
     }
 
     public final Integer[] getSelectedIndices() {
-        Collections.sort(mSelectedIndices, new IndexSorter(mGoingBack));
         return mSelectedIndices.toArray(new Integer[mSelectedIndices.size()]);
     }
 
     public final boolean isIndexSelected(int index) {
         return mSelectedIndices.contains(index);
-    }
-
-    public class IndexSorter implements Comparator<Integer> {
-
-        private boolean mGoingBack;
-
-        public IndexSorter(boolean goingBack) {
-            mGoingBack = goingBack;
-        }
-
-        @Override
-        public int compare(Integer lhs, Integer rhs) {
-            if (mGoingBack) {
-                return lhs < rhs ? 1 : (lhs.intValue() == rhs.intValue() ? 0 : -1);
-            } else {
-                return lhs < rhs ? -1 : (lhs.intValue() == rhs.intValue() ? 0 : 1);
-            }
-        }
     }
 }
