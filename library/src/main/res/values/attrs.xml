@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="DragSelectRecyclerView">
+        <attr name="dsrv_autoScrollHotspotHeight" format="dimension" />
+        <attr name="dsrv_autoScrollEnabled" format="boolean" />
+    </declare-styleable>
+
+</resources>
