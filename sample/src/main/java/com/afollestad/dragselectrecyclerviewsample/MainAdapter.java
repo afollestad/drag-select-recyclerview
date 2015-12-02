@@ -73,11 +73,6 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
     }
 
     @Override
-    protected boolean isIndexSelectable(int index) {
-        return index != 4;
-    }
-
-    @Override
     public void onBindViewHolder(MainViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
 

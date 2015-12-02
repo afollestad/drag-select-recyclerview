@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     // ...
-    compile('com.github.afollestad:drag-select-recyclerview:0.2.1@aar') {
+    compile('com.github.afollestad:drag-select-recyclerview:0.3.0@aar') {
         transitive = true
     }
 }
@@ -44,7 +44,8 @@ dependencies {
 1. [Introduction](https://github.com/afollestad/drag-select-recyclerview#introduction)
 2. [DragSelectRecyclerView](https://github.com/afollestad/drag-select-recyclerview#dragselectrecyclerview)
 3. [DragSelectRecyclerViewAdapter](https://github.com/afollestad/drag-select-recyclerview#dragselectrecyclerviewadapter)
-4. [User Activation](https://github.com/afollestad/drag-select-recyclerview#user-activation)
+    1. An example of how adapter's should be setup. Goes over how to know which items are selected, how to prevent certain items from being selected, etc.
+4. [User Activation, Initializing Drag Selection](https://github.com/afollestad/drag-select-recyclerview#user-activation-initializing-drag-selection)
 5. [Selection Retrieval and Modification](https://github.com/afollestad/drag-select-recyclerview#selection-retrieval-and-modification)
 6. [Auto Scroll](https://github.com/afollestad/drag-select-recyclerview#auto-scroll)
 
@@ -97,30 +98,7 @@ listen for changes, and check if a certain index is selected.
 A basic adapter implementation looks like this:
 
 ```java
-public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHolder>
-        implements View.OnClickListener, View.OnLongClickListener {
-
-    // Receives View.OnClickListener set in onBindViewHolder(), tag contains index
-    @Override
-    public void onClick(View v) {
-        if (v.getTag() != null) {
-            int index = (int) v.getTag();
-            // Forwards to the adapter's constructor callback
-            if (mCallback != null) mCallback.onClick(index);
-        }
-    }
-
-    // Receives View.OnLongClickListener set in onBindViewHolder(), tag contains index
-    @Override
-    public boolean onLongClick(View v) {
-        if (v.getTag() != null) {
-            int index = (int) v.getTag();
-            // Forwards to the adapter's constructor callback
-            if (mCallback != null) mCallback.onLongClick(index);
-            return true;
-        }
-        return false;
-    }
+public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHolder> {
 
     public interface ClickListener {
         void onClick(int index);
@@ -129,7 +107,6 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
     }
 
     private final ClickListener mCallback;
-
 
     // Constructor takes click listener callback
     protected MainAdapter(ClickListener callback) {
@@ -145,6 +122,8 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
 
     @Override
     public void onBindViewHolder(MainViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position); // this line is important!
+    
         // Sets position + 1 to a label view
         holder.label.setText(String.format("%d", position + 1));
 
@@ -153,11 +132,13 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
         } else {
             // Item is not selected, reset it to a non-selected state
         }
+    }
 
-        // Tag is used to retrieve index from the click/long-click listeners
-        holder.itemView.setTag(position);
-        holder.itemView.setOnClickListener(this);
-        holder.itemView.setOnLongClickListener(this);
+    @Override
+    protected boolean isIndexSelectable(int index) {
+        // This method is OPTIONAL, returning false will prevent the item at the specified index from being selected.
+        // Both initial selection, and drag selection.
+        return true;
     }
 
     @Override
@@ -165,13 +146,29 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
         return 60;
     }
 
-    public class MainViewHolder extends RecyclerView.ViewHolder {
+    public class MainViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener{
 
         public final TextView label;
 
         public MainViewHolder(View itemView) {
             super(itemView);
             this.label = (TextView) itemView.findViewById(R.id.label);
+            this.itemView.setOnClickListener(this);
+            this.itemView.setOnLongClickListener(this);
+        }
+        
+        @Override
+        public void onClick(View v) {
+            // Forwards to the adapter's constructor callback
+            if (mCallback != null) mCallback.onClick(getAdapterPosition());
+        }
+    
+        @Override
+        public boolean onLongClick(View v) {
+            // Forwards to the adapter's constructor callback
+            if (mCallback != null) mCallback.onLongClick(getAdapterPosition());
+            return true;
         }
     }
 }
@@ -182,7 +179,7 @@ true or false. The click listener implementation used here will aid in the next 
 
 ---
 
-# User Activation
+# User Activation, Initializing Drag Selection
 
 The library won't start selection mode unless you tell it to. You want the user to be able to active it.
 The click listener implementation setup in the adapter above will help with this.
