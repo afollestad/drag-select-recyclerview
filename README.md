@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     // ...
-    compile('com.github.afollestad:drag-select-recyclerview:0.2.0') {
+    compile('com.github.afollestad:drag-select-recyclerview:0.2.0@aar') {
         transitive = true
     }
 }
