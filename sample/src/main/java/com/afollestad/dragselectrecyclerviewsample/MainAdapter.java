@@ -69,7 +69,7 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
     @Override
     public MainViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.griditem_main, parent, false);
-        return new MainViewHolder(v);
+        return new MainViewHolder(v, mCallback);
     }
 
     @Override
@@ -99,14 +99,17 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
         return ALPHABET.length;
     }
 
-    public class MainViewHolder extends RecyclerView.ViewHolder
+    public static class MainViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, View.OnLongClickListener {
 
         public final TextView label;
         public final RectangleView colorSquare;
+        private final ClickListener mCallback;
 
-        public MainViewHolder(View itemView) {
+        public MainViewHolder(View itemView, ClickListener callback) {
             super(itemView);
+            mCallback = callback;
+
             this.label = (TextView) itemView.findViewById(R.id.label);
             this.colorSquare = (RectangleView) itemView.findViewById(R.id.colorSquare);
             this.itemView.setOnClickListener(this);
