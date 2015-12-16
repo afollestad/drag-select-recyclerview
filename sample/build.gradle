@@ -4,6 +4,9 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
+    lintOptions {
+        abortOnError false
+    }
     defaultConfig {
         applicationId "com.afollestad.dragselectrecyclerviewsample"
         minSdkVersion 14
