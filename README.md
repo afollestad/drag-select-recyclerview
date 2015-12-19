@@ -21,6 +21,7 @@ You can [download a sample APK](https://github.com/afollestad/drag-select-recycl
 
 [![JitPack](https://img.shields.io/github/release/afollestad/drag-select-recyclerview.svg?label=jitpack)](https://jitpack.io/#afollestad/drag-select-recyclerview)
 [![Build Status](https://travis-ci.org/afollestad/drag-select-recyclerview.svg)](https://travis-ci.org/afollestad/drag-select-recyclerview)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 ### Repository
 
