@@ -3,6 +3,7 @@ package com.afollestad.dragselectrecyclerview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -15,6 +16,10 @@ import com.afollestad.library.R;
  * @author Aidan Follestad (afollestad)
  */
 public class DragSelectRecyclerView extends RecyclerView {
+
+    public interface FingerListener {
+        void onDragSelectFingerAction(boolean fingerDown);
+    }
 
     private static final boolean LOGGING = false;
     private static final int AUTO_SCROLL_DELAY = 25;
@@ -56,6 +61,8 @@ public class DragSelectRecyclerView extends RecyclerView {
     private int mHotspotBottomBound;
     private int mAutoScrollVelocity;
 
+    private FingerListener mFingerListener;
+
     private void init(Context context, AttributeSet attrs) {
         mAutoScrollHandler = new Handler();
         final int defaultHotspotHeight = context.getResources().getDimensionPixelSize(R.dimen.dsrv_defaultHotspotHeight);
@@ -81,6 +88,10 @@ public class DragSelectRecyclerView extends RecyclerView {
         }
     }
 
+    public void setFingerListener(@Nullable FingerListener listener) {
+        this.mFingerListener = listener;
+    }
+
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
         super.onMeasure(widthSpec, heightSpec);
@@ -93,7 +104,11 @@ public class DragSelectRecyclerView extends RecyclerView {
         }
     }
 
-    public void setDragSelectActive(boolean active, int initialSelection) {
+    public boolean setDragSelectActive(boolean active, int initialSelection) {
+        if (active && mDragSelectActive) {
+            LOG("Drag selection is already active.");
+            return false;
+        }
         mLastDraggedIndex = -1;
         mMinReached = -1;
         mMaxReached = -1;
@@ -101,12 +116,17 @@ public class DragSelectRecyclerView extends RecyclerView {
             mDragSelectActive = false;
             mInitialSelection = -1;
             mLastDraggedIndex = -1;
-            return;
+            LOG("Index %d is not selectable.", initialSelection);
+            return false;
         }
         mAdapter.setSelected(initialSelection, true);
         mDragSelectActive = active;
         mInitialSelection = initialSelection;
         mLastDraggedIndex = initialSelection;
+        if (mFingerListener != null)
+            mFingerListener.onDragSelectFingerAction(true);
+        LOG("Drag selection initialized, starting at index %d.", initialSelection);
+        return true;
     }
 
     /**
@@ -162,6 +182,8 @@ public class DragSelectRecyclerView extends RecyclerView {
                 mInTopHotspot = false;
                 mInBottomHotspot = false;
                 mAutoScrollHandler.removeCallbacks(mAutoScrollRunnable);
+                if (mFingerListener != null)
+                    mFingerListener.onDragSelectFingerAction(false);
                 return true;
             } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
                 // Check for auto-scroll hotspot
