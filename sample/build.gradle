@@ -22,13 +22,9 @@ android {
     }
 }
 
-repositories {
-    maven { url "https://jitpack.io" }
-}
-
 dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile('com.afollestad:material-cab:c4a69c04e3@aar') {
+    compile('com.github.afollestad:material-cab:0.1.8@aar') {
         transitive = true
     }
     compile project(':library')
