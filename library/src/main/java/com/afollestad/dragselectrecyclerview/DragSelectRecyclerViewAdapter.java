@@ -18,6 +18,7 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
     private ArrayList<Integer> mSelectedIndices;
     private SelectionListener mSelectionListener;
     private int mLastCount = -1;
+    private int mMaxSelectionCount = -1;
 
     private void fireSelectionListener() {
         if (mLastCount == mSelectedIndices.size())
@@ -29,6 +30,10 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
 
     protected DragSelectRecyclerViewAdapter() {
         mSelectedIndices = new ArrayList<>();
+    }
+
+    public void setMaxSelectionCount(int maxSelectionCount) {
+        this.mMaxSelectionCount = maxSelectionCount;
     }
 
     public void setSelectionListener(SelectionListener selectionListener) {
@@ -52,7 +57,9 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
         if (!isIndexSelectable(index))
             selected = false;
         if (selected) {
-            if (!mSelectedIndices.contains(index)) {
+            if (!mSelectedIndices.contains(index) &&
+                    (mMaxSelectionCount == -1 ||
+                            mSelectedIndices.size() < mMaxSelectionCount)) {
                 mSelectedIndices.add(index);
                 notifyItemChanged(index);
             }
@@ -68,7 +75,8 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
         if (isIndexSelectable(index)) {
             if (mSelectedIndices.contains(index)) {
                 mSelectedIndices.remove((Integer) index);
-            } else {
+            } else if (mMaxSelectionCount == -1 ||
+                    mSelectedIndices.size() < mMaxSelectionCount) {
                 mSelectedIndices.add(index);
                 selectedNow = true;
             }
@@ -93,10 +101,7 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
             // Finger is back on the initial item, unselect everything else
             for (int i = min; i <= max; i++) {
                 if (i == from) continue;
-                if (mSelectedIndices.contains(i)) {
-                    mSelectedIndices.remove((Integer) i);
-                    notifyItemChanged(i);
-                }
+                setSelected(i, false);
             }
             fireSelectionListener();
             return;
