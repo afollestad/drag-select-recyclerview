@@ -11,7 +11,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
-        versionName "0.3.2"
+        versionName "0.3.3"
     }
     lintOptions {
         abortOnError false
@@ -26,5 +26,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:recyclerview-v7:23.2.0'
+    compile 'com.android.support:recyclerview-v7:23.2.1'
 }
