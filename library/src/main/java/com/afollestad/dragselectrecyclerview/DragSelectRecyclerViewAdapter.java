@@ -41,13 +41,21 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
     }
 
     public void saveInstanceState(Bundle out) {
-        out.putSerializable("selected_indices", mSelectedIndices);
+        saveInstanceState("selected_indices", out);
+    }
+
+    public void saveInstanceState(String key, Bundle out) {
+        out.putSerializable(key, mSelectedIndices);
     }
 
     public void restoreInstanceState(Bundle in) {
-        if (in != null && in.containsKey("selected_indices")) {
+        restoreInstanceState("selected_indices", in);
+    }
+
+    public void restoreInstanceState(String key, Bundle in) {
+        if (in != null && in.containsKey(key)) {
             //noinspection unchecked
-            mSelectedIndices = (ArrayList<Integer>) in.getSerializable("selected_indices");
+            mSelectedIndices = (ArrayList<Integer>) in.getSerializable(key);
             if (mSelectedIndices == null) mSelectedIndices = new ArrayList<>();
             else fireSelectionListener();
         }
