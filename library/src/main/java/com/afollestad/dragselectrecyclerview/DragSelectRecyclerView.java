@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.afollestad.library.R;
-
 /**
  * @author Aidan Follestad (afollestad)
  */
