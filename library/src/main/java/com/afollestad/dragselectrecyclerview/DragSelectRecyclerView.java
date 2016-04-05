@@ -2,6 +2,10 @@ package com.afollestad.dragselectrecyclerview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -55,8 +59,13 @@ public class DragSelectRecyclerView extends RecyclerView {
     private int mMaxReached;
 
     private int mHotspotHeight;
-    private int mHotspotTopBound;
-    private int mHotspotBottomBound;
+    private int mHotspotOffsetTop;
+    private int mHotspotOffsetBottom;
+
+    private int mHotspotTopBoundStart;
+    private int mHotspotTopBoundEnd;
+    private int mHotspotBottomBoundStart;
+    private int mHotspotBottomBoundEnd;
     private int mAutoScrollVelocity;
 
     private FingerListener mFingerListener;
@@ -71,10 +80,16 @@ public class DragSelectRecyclerView extends RecyclerView {
                 boolean autoScrollEnabled = a.getBoolean(R.styleable.DragSelectRecyclerView_dsrv_autoScrollEnabled, true);
                 if (!autoScrollEnabled) {
                     mHotspotHeight = -1;
+                    mHotspotOffsetTop = -1;
+                    mHotspotOffsetBottom = -1;
                     LOG("Auto-scroll disabled");
                 } else {
                     mHotspotHeight = a.getDimensionPixelSize(
                             R.styleable.DragSelectRecyclerView_dsrv_autoScrollHotspotHeight, defaultHotspotHeight);
+                    mHotspotOffsetTop = a.getDimensionPixelSize(
+                            R.styleable.DragSelectRecyclerView_dsrv_autoScrollHotspot_offsetTop, 0);
+                    mHotspotOffsetBottom = a.getDimensionPixelSize(
+                            R.styleable.DragSelectRecyclerView_dsrv_autoScrollHotspot_offsetBottom, 0);
                     LOG("Hotspot height = %d", mHotspotHeight);
                 }
             } finally {
@@ -94,11 +109,13 @@ public class DragSelectRecyclerView extends RecyclerView {
     protected void onMeasure(int widthSpec, int heightSpec) {
         super.onMeasure(widthSpec, heightSpec);
         if (mHotspotHeight > -1) {
-            mHotspotTopBound = mHotspotHeight;
-            mHotspotBottomBound = getMeasuredHeight() - mHotspotHeight;
+            mHotspotTopBoundStart = mHotspotOffsetTop;
+            mHotspotTopBoundEnd = mHotspotOffsetTop + mHotspotHeight;
+            mHotspotBottomBoundStart = (getMeasuredHeight() - mHotspotHeight) - mHotspotOffsetBottom;
+            mHotspotBottomBoundEnd = getMeasuredHeight() - mHotspotOffsetBottom;
             LOG("RecyclerView height = %d", getMeasuredHeight());
-            LOG("Hotspot top bound = %d", mHotspotTopBound);
-            LOG("Hotspot bottom bound = %d", mHotspotBottomBound);
+            LOG("Hotspot top bound = %d to %d", mHotspotTopBoundStart, mHotspotTopBoundStart);
+            LOG("Hotspot bottom bound = %d to %d", mHotspotBottomBoundStart, mHotspotBottomBoundEnd);
         }
     }
 
@@ -171,6 +188,34 @@ public class DragSelectRecyclerView extends RecyclerView {
         return holder.getAdapterPosition();
     }
 
+    private RectF mTopBoundRect;
+    private RectF mBottomBoundRect;
+    private Paint mDebugPaint;
+    private boolean mDebugEnabled = true;
+
+    public final void enableDebug() {
+        mDebugEnabled = true;
+        invalidate();
+    }
+
+    @Override
+    public void onDraw(Canvas c) {
+        super.onDraw(c);
+
+        if (mDebugEnabled) {
+            if (mDebugPaint == null) {
+                mDebugPaint = new Paint();
+                mDebugPaint.setColor(Color.BLACK);
+                mDebugPaint.setAntiAlias(true);
+                mDebugPaint.setStyle(Paint.Style.FILL);
+                mTopBoundRect = new RectF(0, mHotspotTopBoundStart, getMeasuredWidth(), mHotspotTopBoundEnd);
+                mBottomBoundRect = new RectF(0, mHotspotBottomBoundStart, getMeasuredWidth(), mHotspotBottomBoundEnd);
+            }
+            c.drawRect(mTopBoundRect, mDebugPaint);
+            c.drawRect(mBottomBoundRect, mDebugPaint);
+        }
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
         if (mDragSelectActive) {
@@ -186,7 +231,7 @@ public class DragSelectRecyclerView extends RecyclerView {
             } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
                 // Check for auto-scroll hotspot
                 if (mHotspotHeight > -1) {
-                    if (e.getY() <= mHotspotTopBound) {
+                    if (e.getY() >= mHotspotTopBoundStart && e.getY() <= mHotspotTopBoundEnd) {
                         mInBottomHotspot = false;
                         if (!mInTopHotspot) {
                             mInTopHotspot = true;
@@ -194,9 +239,13 @@ public class DragSelectRecyclerView extends RecyclerView {
                             mAutoScrollHandler.removeCallbacks(mAutoScrollRunnable);
                             mAutoScrollHandler.postDelayed(mAutoScrollRunnable, AUTO_SCROLL_DELAY);
                         }
-                        mAutoScrollVelocity = (int) (mHotspotTopBound - e.getY()) / 2;
+
+                        final float simulatedFactor = mHotspotTopBoundEnd - mHotspotTopBoundStart;
+                        final float simulatedY = e.getY() - mHotspotTopBoundStart;
+                        mAutoScrollVelocity = (int) (simulatedFactor - simulatedY) / 2;
+
                         LOG("Auto scroll velocity = %d", mAutoScrollVelocity);
-                    } else if (e.getY() >= mHotspotBottomBound) {
+                    } else if (e.getY() >= mHotspotBottomBoundStart && e.getY() <= mHotspotBottomBoundEnd) {
                         mInTopHotspot = false;
                         if (!mInBottomHotspot) {
                             mInBottomHotspot = true;
@@ -204,7 +253,11 @@ public class DragSelectRecyclerView extends RecyclerView {
                             mAutoScrollHandler.removeCallbacks(mAutoScrollRunnable);
                             mAutoScrollHandler.postDelayed(mAutoScrollRunnable, AUTO_SCROLL_DELAY);
                         }
-                        mAutoScrollVelocity = (int) (e.getY() - mHotspotBottomBound) / 2;
+
+                        final float simulatedY = e.getY() + mHotspotBottomBoundEnd;
+                        final float simulatedFactor = mHotspotBottomBoundStart + mHotspotBottomBoundEnd;
+                        mAutoScrollVelocity = (int) (simulatedY - simulatedFactor) / 2;
+
                         LOG("Auto scroll velocity = %d", mAutoScrollVelocity);
                     } else if (mInTopHotspot || mInBottomHotspot) {
                         LOG("Left the hotspot");
