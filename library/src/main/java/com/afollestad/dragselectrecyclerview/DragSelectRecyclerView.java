@@ -191,7 +191,7 @@ public class DragSelectRecyclerView extends RecyclerView {
     private RectF mTopBoundRect;
     private RectF mBottomBoundRect;
     private Paint mDebugPaint;
-    private boolean mDebugEnabled = true;
+    private boolean mDebugEnabled = false;
 
     public final void enableDebug() {
         mDebugEnabled = true;
