@@ -5,13 +5,13 @@ group='com.afollestad'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
-        versionName "0.3.4"
+        versionName "0.3.5"
     }
     lintOptions {
         abortOnError false
@@ -26,5 +26,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:recyclerview-v7:23.2.1'
+    compile 'com.android.support:recyclerview-v7:23.3.0'
 }
