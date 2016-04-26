@@ -218,6 +218,9 @@ public class DragSelectRecyclerView extends RecyclerView {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
+        if (mAdapter.getItemCount() == 0)
+            return super.dispatchTouchEvent(e);
+
         if (mDragSelectActive) {
             final int itemPosition = getItemPosition(e);
             if (e.getAction() == MotionEvent.ACTION_UP) {
