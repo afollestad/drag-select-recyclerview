@@ -1,7 +1,10 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.afollestad'
+ext {
+    PUBLISH_GROUP_ID = 'com.afollestad'
+    PUBLISH_ARTIFACT_ID = 'drag-select-recyclerview'
+    PUBLISH_VERSION = '0.3.5'
+}
 
 android {
     compileSdkVersion 23
@@ -28,3 +31,5 @@ android {
 dependencies {
     compile 'com.android.support:recyclerview-v7:23.3.0'
 }
+
+apply from: 'https://raw.githubusercontent.com/afollestad/aidanfollestad.com/master/android-release-aar.gradle'

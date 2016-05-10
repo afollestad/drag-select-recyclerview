@@ -24,7 +24,7 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
-    compile('com.github.afollestad:material-cab:0.1.11@aar') {
+    compile('com.afollestad:material-cab:0.1.12@aar') {
         transitive = true
     }
     compile project(':library')

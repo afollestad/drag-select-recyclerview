@@ -19,22 +19,12 @@ You can [download a sample APK](https://github.com/afollestad/drag-select-recycl
 
 # Gradle Dependency
 
-[![Release](https://jitpack.io/v/afollestad/drag-select-recyclerview.svg)](https://jitpack.io/#afollestad/drag-select-recyclerview)
+[ ![jCenter](https://api.bintray.com/packages/drummer-aidan/maven/drag-select-recyclerview/images/download.svg) ](https://bintray.com/drummer-aidan/maven/drag-select-recyclerview/_latestVersion)
 [![Build Status](https://travis-ci.org/afollestad/drag-select-recyclerview.svg)](https://travis-ci.org/afollestad/drag-select-recyclerview)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-### Repository
-
-Add this in your root `build.gradle` file (**not** your module `build.gradle` file):
-
-```gradle
-allprojects {
-	repositories {
-		...
-		maven { url "https://jitpack.io" }
-	}
-}
-```
+The Gradle dependency is available via [jCenter](https://bintray.com/drummer-aidan/maven/material-camera/view).
+jCenter is the default Maven repository used by Android Studio.
 
 ## Dependency
 
@@ -42,7 +32,8 @@ Add the following to your module's `build.gradle` file:
 
 ```Gradle
 dependencies {
-    // ...
+    // ... other dependencies
+
     compile('com.github.afollestad:drag-select-recyclerview:0.3.5@aar') {
         transitive = true
     }
