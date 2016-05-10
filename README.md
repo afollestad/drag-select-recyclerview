@@ -34,7 +34,7 @@ Add the following to your module's `build.gradle` file:
 dependencies {
     // ... other dependencies
 
-    compile('com.github.afollestad:drag-select-recyclerview:0.3.5@aar') {
+    compile('com.afollestad:drag-select-recyclerview:0.3.5@aar') {
         transitive = true
     }
 }
