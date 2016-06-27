@@ -149,6 +149,18 @@ public abstract class DragSelectRecyclerViewAdapter<VH extends RecyclerView.View
         fireSelectionListener();
     }
 
+    public final void selectAll() {
+        int max = getItemCount();
+        mSelectedIndices.clear();
+        for (int i = 0; i < max; i++) {
+            if (isIndexSelectable(i)) {
+                mSelectedIndices.add(i);
+            }
+        }
+        notifyDataSetChanged();
+        fireSelectionListener();
+    }
+
     public final void clearSelected() {
         mSelectedIndices.clear();
         notifyDataSetChanged();
