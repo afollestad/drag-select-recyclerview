@@ -3,10 +3,10 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = 'com.afollestad'
     PUBLISH_ARTIFACT_ID = 'drag-select-recyclerview'
-    PUBLISH_VERSION = '0.3.6'
-    TARGET_SDK = 24
-    BUILD_TOOLS = "24.0.0"
-    GOOGLE_LIBS = "24.0.0"
+    PUBLISH_VERSION = '0.4.0'
+    TARGET_SDK = 25
+    BUILD_TOOLS = "24.0.3"
+    GOOGLE_LIBS = "25.0.0"
 }
 
 android {

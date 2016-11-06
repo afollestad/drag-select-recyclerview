@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         // Save selected indices
         mAdapter.saveInstanceState(outState);
         if (mCab != null) mCab.saveState(outState);

@@ -33,7 +33,7 @@ Add the following to your module's `build.gradle` file:
 ```Gradle
 dependencies {
     // ... other dependencies
-    compile 'com.afollestad:drag-select-recyclerview:0.3.6'
+    compile 'com.afollestad:drag-select-recyclerview:0.4.0'
 }
 ```
 
