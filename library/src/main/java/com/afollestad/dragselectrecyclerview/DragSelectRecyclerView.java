@@ -181,7 +181,7 @@ public class DragSelectRecyclerView extends RecyclerView {
 
     private int getItemPosition(MotionEvent e) {
         final View v = findChildViewUnder(e.getX(), e.getY());
-        if (v == null) return -2;
+        if (v == null) return NO_POSITION;
         if (v.getTag() == null || !(v.getTag() instanceof ViewHolder))
             throw new IllegalStateException("Make sure your adapter makes a call to super.onBindViewHolder(), and doesn't override itemView tags.");
         final ViewHolder holder = (ViewHolder) v.getTag();
@@ -271,7 +271,7 @@ public class DragSelectRecyclerView extends RecyclerView {
                 }
 
                 // Drag selection logic
-                if (itemPosition != -2 && mLastDraggedIndex != itemPosition) {
+                if (itemPosition != NO_POSITION && mLastDraggedIndex != itemPosition) {
                     mLastDraggedIndex = itemPosition;
                     if (mMinReached == -1) mMinReached = mLastDraggedIndex;
                     if (mMaxReached == -1) mMaxReached = mLastDraggedIndex;
