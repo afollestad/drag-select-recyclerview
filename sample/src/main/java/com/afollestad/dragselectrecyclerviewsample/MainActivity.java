@@ -1,12 +1,14 @@
 package com.afollestad.dragselectrecyclerviewsample;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerView;
@@ -18,10 +20,12 @@ import com.afollestad.materialcab.MaterialCab;
  */
 public class MainActivity extends AppCompatActivity implements
         MainAdapter.ClickListener, DragSelectRecyclerViewAdapter.SelectionListener, MaterialCab.Callback {
-
+    private boolean demoEmptyView = false; //toggle to demo empty view
     private DragSelectRecyclerView mList;
     private MainAdapter mAdapter;
     private MaterialCab mCab;
+    private final static String[] ALPHABET = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split(" ");
+    private final static String[] NULL_ARRAY = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,18 +34,33 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
 
         // Setup adapter and callbacks
-        mAdapter = new MainAdapter(this);
+        if (demoEmptyView) //optional feature to add empty view when input list is empty
+            mAdapter = new MainAdapter(this, NULL_ARRAY);
+        else
+            mAdapter = new MainAdapter(this, ALPHABET);
         // Receives selection updates, recommended to set before restoreInstanceState() so initial reselection is received
         mAdapter.setSelectionListener(this);
         // Restore selected indices after Activity recreation
         mAdapter.restoreInstanceState(savedInstanceState);
-
         // Setup the RecyclerView
         mList = (DragSelectRecyclerView) findViewById(R.id.list);
         mList.setLayoutManager(new GridLayoutManager(this, getResources().getInteger(R.integer.grid_width)));
         mList.setAdapter(mAdapter);
 
+        if (demoEmptyView) {
+            customizeEmtpyView();
+        }
         mCab = MaterialCab.restoreState(savedInstanceState, this, this);
+    }
+
+    public void customizeEmtpyView() {
+        //custom empty view to be insert when collection is empty
+        RelativeLayout emptyViewLayout = (RelativeLayout) findViewById(R.id.empty_view);
+        TextView mText = (TextView) findViewById(R.id.empty_view_txt);
+        ImageView mImageView = (ImageView) findViewById(R.id.empty_view_img);
+        mText.setText("This is empty view");
+        mImageView.setImageResource(android.R.drawable.ic_dialog_dialer);
+        mList.setEmptyView(emptyViewLayout);
     }
 
     @Override
