@@ -14,12 +14,14 @@ import android.widget.TextView;
 
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
 
+import java.util.List;
+
 /**
  * @author Aidan Follestad (afollestad)
  */
 public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHolder> {
 
-    private final static String[] ALPHABET = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split(" ");
+    private static String[] mList = null;
     private final static int[] COLORS = new int[]{
             Color.parseColor("#F44336"),
             Color.parseColor("#E91E63"),
@@ -57,13 +59,14 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
 
     private final ClickListener mCallback;
 
-    protected MainAdapter(ClickListener callback) {
+    protected MainAdapter(ClickListener callback, String[] list) {
         super();
+        mList = list;
         mCallback = callback;
     }
 
     public String getItem(int index) {
-        return ALPHABET[index];
+        return mList[index];
     }
 
     @Override
@@ -96,7 +99,10 @@ public class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainV
 
     @Override
     public int getItemCount() {
-        return ALPHABET.length;
+        if (mList == null)
+            return 0;
+        else
+            return mList.length;
     }
 
     public static class MainViewHolder extends RecyclerView.ViewHolder

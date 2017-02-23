@@ -18,6 +18,7 @@ import android.view.View;
  * @author Aidan Follestad (afollestad)
  */
 public class DragSelectRecyclerView extends RecyclerView {
+    private View emptyView;
 
     public interface FingerListener {
         void onDragSelectFingerAction(boolean fingerDown);
@@ -156,8 +157,55 @@ public class DragSelectRecyclerView extends RecyclerView {
     }
 
     public void setAdapter(DragSelectRecyclerViewAdapter<?> adapter) {
+        final Adapter oldAdapter = getAdapter();
+        if (oldAdapter != null) {
+            oldAdapter.unregisterAdapterDataObserver(observer);
+        }
         super.setAdapter(adapter);
+        if (adapter != null) {
+            adapter.registerAdapterDataObserver(observer);
+        }
         mAdapter = adapter;
+        checkIfEmpty();
+    }
+
+    /**
+     * Create observer and callback that will be registered to {@link DragSelectRecyclerViewAdapter}.
+     */
+    final private AdapterDataObserver observer = new AdapterDataObserver() {
+        @Override
+        public void onChanged() {
+            checkIfEmpty();
+        }
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            checkIfEmpty();
+        }
+
+        @Override
+        public void onItemRangeRemoved(int positionStart, int itemCount) {
+            checkIfEmpty();
+        }
+    };
+
+    /**
+     * Check if empty view should be visible according to item counts of {@link DragSelectRecyclerViewAdapter}.
+     */
+    void checkIfEmpty() {
+        if (emptyView != null && getAdapter() != null) {
+            final boolean emptyViewVisible = getAdapter().getItemCount() == 0;
+            emptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
+            setVisibility(emptyViewVisible ? GONE : VISIBLE);
+        }
+    }
+
+    /**
+     * Set the empty view to be shown when no item is available in {@link DragSelectRecyclerViewAdapter}.
+     */
+    public void setEmptyView(View emptyView) {
+        this.emptyView = emptyView;
+        checkIfEmpty();
     }
 
     private boolean mInTopHotspot;
