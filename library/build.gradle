@@ -1,23 +1,21 @@
 apply plugin: 'com.android.library'
+apply from: '../dependencies.gradle'
 
 ext {
     PUBLISH_GROUP_ID = 'com.afollestad'
     PUBLISH_ARTIFACT_ID = 'drag-select-recyclerview'
-    PUBLISH_VERSION = '0.4.0'
-    TARGET_SDK = 25
-    BUILD_TOOLS = "24.0.3"
-    GOOGLE_LIBS = "25.0.0"
+    PUBLISH_VERSION = versions.publishVersion
 }
 
 android {
-    compileSdkVersion TARGET_SDK
-    buildToolsVersion BUILD_TOOLS
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion TARGET_SDK
-        versionCode 12
-        versionName PUBLISH_VERSION
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode versions.publishVersionCode
+        versionName versions.publishVersion
     }
     lintOptions {
         abortOnError false
@@ -32,7 +30,7 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:recyclerview-v7:$GOOGLE_LIBS"
+    compile 'com.android.support:recyclerview-v7:' + versions.supportLib
 }
 
 apply from: 'https://raw.githubusercontent.com/afollestad/aidanfollestad.com/master/android-lib-release.gradle'

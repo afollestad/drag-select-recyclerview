@@ -1,25 +1,19 @@
 apply plugin: 'com.android.application'
-
-ext {
-    PUBLISH_VERSION = '0.4.0'
-    TARGET_SDK = 25
-    BUILD_TOOLS = "24.0.3"
-    GOOGLE_LIBS = "25.0.0"
-}
+apply from: '../dependencies.gradle'
 
 android {
-    compileSdkVersion TARGET_SDK
-    buildToolsVersion BUILD_TOOLS
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 
     lintOptions {
         abortOnError false
     }
     defaultConfig {
         applicationId "com.afollestad.dragselectrecyclerviewsample"
-        minSdkVersion 14
-        targetSdkVersion TARGET_SDK
-        versionCode 12
-        versionName PUBLISH_VERSION
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode versions.publishVersionCode
+        versionName versions.publishVersion
     }
     buildTypes {
         release {
@@ -32,6 +26,6 @@ android {
 dependencies {
     compile project(':library')
 
-    compile "com.android.support:appcompat-v7:$GOOGLE_LIBS"
-    compile "com.afollestad:material-cab:0.1.12"
+    compile 'com.android.support:appcompat-v7:' + versions.supportLib
+    compile 'com.afollestad:material-cab:' + versions.materialCab
 }
