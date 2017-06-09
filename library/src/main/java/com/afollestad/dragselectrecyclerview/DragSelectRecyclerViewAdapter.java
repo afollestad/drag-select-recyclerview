@@ -3,7 +3,6 @@ package com.afollestad.dragselectrecyclerview;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
-
 import java.util.ArrayList;
 
 /** @author Aidan Follestad (afollestad) */

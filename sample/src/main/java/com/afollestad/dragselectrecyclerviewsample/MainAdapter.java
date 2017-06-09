@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
 
 /** @author Aidan Follestad (afollestad) */
