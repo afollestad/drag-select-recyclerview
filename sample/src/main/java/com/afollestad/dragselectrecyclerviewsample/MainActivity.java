@@ -1,6 +1,7 @@
 package com.afollestad.dragselectrecyclerviewsample;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,13 +11,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerView;
 import com.afollestad.materialcab.MaterialCab;
 
 /** @author Aidan Follestad (afollestad) */
 public class MainActivity extends AppCompatActivity
-    implements MainAdapter.ClickListener, MaterialCab.Callback {
+    implements MainAdapter.Listener, MaterialCab.Callback {
 
   private DragSelectRecyclerView listView;
   private MainAdapter adapter;
@@ -65,22 +65,23 @@ public class MainActivity extends AppCompatActivity
     listView.setDragSelectActive(true, index);
   }
 
-  //  @Override
-  //  public void onDragSelectionChanged(int count) {
-  //    if (count > 0) {
-  //      if (cab == null) {
-  //        cab =
-  //            new MaterialCab(this, R.id.cab_stub)
-  //                .setMenu(R.menu.cab)
-  //                .setCloseDrawableRes(R.drawable.ic_close)
-  //                .start(this);
-  //      }
-  //      cab.setTitleRes(R.string.cab_title_x, count);
-  //    } else if (cab != null && cab.isActive()) {
-  //      cab.reset().finish();
-  //      cab = null;
-  //    }
-  //  }
+  @Override
+  public void onSelectionChanged(int count) {
+    if (count > 0) {
+      if (cab == null) {
+        cab =
+            new MaterialCab(this, R.id.cab_stub)
+                .setMenu(R.menu.cab)
+                .setCloseDrawableRes(R.drawable.ic_close)
+                .start(this);
+        cab.getToolbar().setTitleTextColor(Color.BLACK);
+      }
+      cab.setTitleRes(R.string.cab_title_x, count);
+    } else if (cab != null && cab.isActive()) {
+      cab.reset().finish();
+      cab = null;
+    }
+  }
 
   // Material CAB Callbacks
 

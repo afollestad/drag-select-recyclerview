@@ -8,7 +8,5 @@ public interface IDragSelectAdapter {
 
   boolean isIndexSelectable(int index);
 
-  void notifySelections();
-
   int getItemCount();
 }

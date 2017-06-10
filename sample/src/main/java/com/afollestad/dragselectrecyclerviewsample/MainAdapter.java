@@ -12,9 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
 import com.afollestad.dragselectrecyclerview.IDragSelectAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,15 +54,17 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder>
         Color.parseColor("#03A9F4")
       };
 
-  interface ClickListener {
+  interface Listener {
     void onClick(int index);
 
     void onLongClick(int index);
+
+    void onSelectionChanged(int count);
   }
 
-  private final ClickListener callback;
+  private final Listener callback;
 
-  MainAdapter(ClickListener callback) {
+  MainAdapter(Listener callback) {
     super();
     this.selectedIndices = new ArrayList<>(16);
     this.callback = callback;
@@ -85,11 +85,20 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder>
       selectedIndices.add(index);
     }
     notifyItemChanged(index);
+    if (callback != null) {
+      callback.onSelectionChanged(selectedIndices.size());
+    }
   }
 
   void clearSelected() {
+    if (selectedIndices.isEmpty()) {
+      return;
+    }
     selectedIndices.clear();
     notifyDataSetChanged();
+    if (callback != null) {
+      callback.onSelectionChanged(0);
+    }
   }
 
   @Override
@@ -127,16 +136,15 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder>
     } else if (!selectedIndices.contains(index)) {
       selectedIndices.add(index);
     }
+    notifyItemChanged(index);
+    if (callback != null) {
+      callback.onSelectionChanged(selectedIndices.size());
+    }
   }
 
   @Override
   public boolean isIndexSelectable(int index) {
     return true;
-  }
-
-  @Override
-  public void notifySelections() {
-    notifyDataSetChanged();
   }
 
   @Override
@@ -149,9 +157,9 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder>
 
     private final TextView label;
     final RectangleView colorSquare;
-    private final ClickListener callback;
+    private final Listener callback;
 
-    MainViewHolder(View itemView, ClickListener callback) {
+    MainViewHolder(View itemView, Listener callback) {
       super(itemView);
       this.callback = callback;
       this.label = itemView.findViewById(R.id.label);

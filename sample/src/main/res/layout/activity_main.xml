@@ -9,17 +9,17 @@
 
   <FrameLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?colorPrimary"
+    android:elevation="@dimen/mcab_toolbar_elevation"
+    tools:ignore="UnusedAttribute">
 
     <android.support.v7.widget.Toolbar
       android:id="@+id/main_toolbar"
       android:layout_width="match_parent"
       android:layout_height="?actionBarSize"
-      android:background="?colorPrimary"
-      android:elevation="@dimen/mcab_toolbar_elevation"
       android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-      app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-      tools:ignore="UnusedAttribute"/>
+      app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
     <ViewStub
       android:id="@+id/cab_stub"

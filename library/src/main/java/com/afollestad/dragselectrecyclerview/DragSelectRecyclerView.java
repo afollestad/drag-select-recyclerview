@@ -234,7 +234,6 @@ public class DragSelectRecyclerView extends RecyclerView {
         }
         adapter.setSelected(i, false);
       }
-      adapter.notifySelections();
       return;
     }
 
@@ -277,7 +276,6 @@ public class DragSelectRecyclerView extends RecyclerView {
         }
       }
     }
-    adapter.notifySelections();
   }
 
   @Override
