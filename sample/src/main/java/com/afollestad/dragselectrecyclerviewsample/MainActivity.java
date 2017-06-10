@@ -1,26 +1,28 @@
 package com.afollestad.dragselectrecyclerviewsample;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
+
 import com.afollestad.dragselectrecyclerview.DragSelectRecyclerView;
-import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
 import com.afollestad.materialcab.MaterialCab;
 
 /** @author Aidan Follestad (afollestad) */
 public class MainActivity extends AppCompatActivity
-    implements MainAdapter.ClickListener,
-        DragSelectRecyclerViewAdapter.SelectionListener,
-        MaterialCab.Callback {
+    implements MainAdapter.ClickListener, MaterialCab.Callback {
 
   private DragSelectRecyclerView listView;
   private MainAdapter adapter;
   private MaterialCab cab;
 
+  @SuppressLint("InlinedApi")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -29,10 +31,6 @@ public class MainActivity extends AppCompatActivity
 
     // Setup adapter and callbacks
     adapter = new MainAdapter(this);
-    // Receives selection updates, recommended to set before restoreInstanceState() so initial reselection is received
-    adapter.setSelectionListener(this);
-    // Restore selected indices after Activity recreation
-    adapter.restoreInstanceState(savedInstanceState);
 
     // Setup the RecyclerView
     listView = (DragSelectRecyclerView) findViewById(R.id.list);
@@ -41,14 +39,20 @@ public class MainActivity extends AppCompatActivity
     listView.setAdapter(adapter);
 
     cab = MaterialCab.restoreState(savedInstanceState, this, this);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      int flags = getWindow().getDecorView().getSystemUiVisibility();
+      flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+      getWindow().getDecorView().setSystemUiVisibility(flags);
+    }
   }
 
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    // Save selected indices
-    adapter.saveInstanceState(outState);
-    if (cab != null) cab.saveState(outState);
+    if (cab != null) {
+      cab.saveState(outState);
+    }
   }
 
   @Override
@@ -61,22 +65,22 @@ public class MainActivity extends AppCompatActivity
     listView.setDragSelectActive(true, index);
   }
 
-  @Override
-  public void onDragSelectionChanged(int count) {
-    if (count > 0) {
-      if (cab == null) {
-        cab =
-            new MaterialCab(this, R.id.cab_stub)
-                .setMenu(R.menu.cab)
-                .setCloseDrawableRes(R.drawable.ic_close)
-                .start(this);
-      }
-      cab.setTitleRes(R.string.cab_title_x, count);
-    } else if (cab != null && cab.isActive()) {
-      cab.reset().finish();
-      cab = null;
-    }
-  }
+  //  @Override
+  //  public void onDragSelectionChanged(int count) {
+  //    if (count > 0) {
+  //      if (cab == null) {
+  //        cab =
+  //            new MaterialCab(this, R.id.cab_stub)
+  //                .setMenu(R.menu.cab)
+  //                .setCloseDrawableRes(R.drawable.ic_close)
+  //                .start(this);
+  //      }
+  //      cab.setTitleRes(R.string.cab_title_x, count);
+  //    } else if (cab != null && cab.isActive()) {
+  //      cab.reset().finish();
+  //      cab = null;
+  //    }
+  //  }
 
   // Material CAB Callbacks
 
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity
     return true;
   }
 
+  @SuppressLint("DefaultLocale")
   @Override
   public boolean onCabItemClicked(MenuItem item) {
     if (item.getItemId() == R.id.done) {
@@ -97,7 +102,8 @@ public class MainActivity extends AppCompatActivity
       }
       Toast.makeText(
               this,
-              String.format("Selected letters (%d): %s", adapter.getSelectedCount(), sb.toString()),
+              String.format(
+                  "Selected letters (%d): %s", adapter.getSelectedIndices().size(), sb.toString()),
               Toast.LENGTH_LONG)
           .show();
       adapter.clearSelected();
@@ -107,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void onBackPressed() {
-    if (adapter.getSelectedCount() > 0) {
+    if (!adapter.getSelectedIndices().isEmpty()) {
       adapter.clearSelected();
     } else {
       super.onBackPressed();

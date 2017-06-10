@@ -15,13 +15,14 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /** @author Aidan Follestad (afollestad) */
+@SuppressWarnings("unused")
 public class DragSelectRecyclerView extends RecyclerView {
 
+  @SuppressWarnings("WeakerAccess")
   public interface FingerListener {
     void onDragSelectFingerAction(boolean fingerDown);
   }
 
-  private static final boolean LOGGING = false;
   private static final int AUTO_SCROLL_DELAY = 25;
 
   public DragSelectRecyclerView(Context context) {
@@ -39,20 +40,22 @@ public class DragSelectRecyclerView extends RecyclerView {
     init(context, attrs);
   }
 
-  private static void LOG(String message, Object... args) {
-    //noinspection PointlessBooleanExpression
-    if (!LOGGING) {
+  private void LOG(String message, Object... args) {
+    if (!debugEnabled) {
       return;
     }
     if (args != null) {
-      Log.d("DragSelectRecyclerView", String.format(message, args));
-    } else {
-      Log.d("DragSelectRecyclerView", message);
+      message = String.format(message, args);
     }
+    if (message.equals(lastDebugMsg)) {
+      return;
+    }
+    lastDebugMsg = message;
+    Log.d("DragSelectRecyclerView", message);
   }
 
   private int lastDraggedIndex = -1;
-  private DragSelectRecyclerViewAdapter<?> adapter;
+  private IDragSelectAdapter adapter;
   private int initialSelection;
   private boolean dragSelectActive;
   private int minReached;
@@ -154,19 +157,13 @@ public class DragSelectRecyclerView extends RecyclerView {
     return true;
   }
 
-  /** Use {@link #setAdapter(DragSelectRecyclerViewAdapter)} instead. */
   @Override
-  @Deprecated
   public void setAdapter(Adapter adapter) {
-    if (!(adapter instanceof DragSelectRecyclerViewAdapter<?>)) {
-      throw new IllegalArgumentException("Adapter must be a DragSelectRecyclerViewAdapter.");
+    if (!(adapter instanceof IDragSelectAdapter)) {
+      throw new IllegalArgumentException("Adapter must be implement IDragSelectAdapter.");
     }
-    setAdapter((DragSelectRecyclerViewAdapter<?>) adapter);
-  }
-
-  public void setAdapter(DragSelectRecyclerViewAdapter<?> adapter) {
+    this.adapter = (IDragSelectAdapter) adapter;
     super.setAdapter(adapter);
-    this.adapter = adapter;
   }
 
   private boolean inTopHotspot;
@@ -192,19 +189,17 @@ public class DragSelectRecyclerView extends RecyclerView {
 
   private int getItemPosition(MotionEvent e) {
     final View v = findChildViewUnder(e.getX(), e.getY());
-    if (v == null) return NO_POSITION;
-    if (v.getTag() == null || !(v.getTag() instanceof ViewHolder)) {
-      throw new IllegalStateException(
-          "Make sure your adapter makes a call to super.onBindViewHolder(), and doesn't override itemView tags.");
+    if (v == null) {
+      return NO_POSITION;
     }
-    final ViewHolder holder = (ViewHolder) v.getTag();
-    return holder.getAdapterPosition();
+    return getChildAdapterPosition(v);
   }
 
   private RectF topBoundRect;
   private RectF bottomBoundRect;
   private Paint debugPaint;
   private boolean debugEnabled = false;
+  private String lastDebugMsg;
 
   public final void enableDebug() {
     debugEnabled = true;
@@ -230,11 +225,73 @@ public class DragSelectRecyclerView extends RecyclerView {
     }
   }
 
+  private void selectRange(int from, int to, int min, int max) {
+    if (from == to) {
+      // Finger is back on the initial item, unselect everything else
+      for (int i = min; i <= max; i++) {
+        if (i == from) {
+          continue;
+        }
+        adapter.setSelected(i, false);
+      }
+      adapter.notifySelections();
+      return;
+    }
+
+    if (to < from) {
+      // When selecting from one to previous items
+      for (int i = to; i <= from; i++) {
+        adapter.setSelected(i, true);
+      }
+      if (min > -1 && min < to) {
+        // Unselect items that were selected during this drag but no longer are
+        for (int i = min; i < to; i++) {
+          if (i == from) {
+            continue;
+          }
+          adapter.setSelected(i, false);
+        }
+      }
+      if (max > -1) {
+        for (int i = from + 1; i <= max; i++) {
+          adapter.setSelected(i, false);
+        }
+      }
+    } else {
+      // When selecting from one to next items
+      for (int i = from; i <= to; i++) {
+        adapter.setSelected(i, true);
+      }
+      if (max > -1 && max > to) {
+        // Unselect items that were selected during this drag but no longer are
+        for (int i = to + 1; i <= max; i++) {
+          if (i == from) {
+            continue;
+          }
+          adapter.setSelected(i, false);
+        }
+      }
+      if (min > -1) {
+        for (int i = min; i < from; i++) {
+          adapter.setSelected(i, false);
+        }
+      }
+    }
+    adapter.notifySelections();
+  }
+
   @Override
   public boolean dispatchTouchEvent(MotionEvent e) {
-    if (adapter.getItemCount() == 0) return super.dispatchTouchEvent(e);
-
+    if (adapter == null) {
+      LOG("No IDragSelectAdapter has been set.");
+      return super.dispatchTouchEvent(e);
+    }
+    if (adapter.getItemCount() == 0) {
+      LOG("Adapter reported 0 item count.");
+      return super.dispatchTouchEvent(e);
+    }
     if (dragSelectActive) {
+      LOG("Drag selection is active");
       final int itemPosition = getItemPosition(e);
       if (e.getAction() == MotionEvent.ACTION_UP) {
         dragSelectActive = false;
@@ -300,7 +357,7 @@ public class DragSelectRecyclerView extends RecyclerView {
             minReached = lastDraggedIndex;
           }
           if (adapter != null) {
-            adapter.selectRange(initialSelection, lastDraggedIndex, minReached, maxReached);
+            selectRange(initialSelection, lastDraggedIndex, minReached, maxReached);
           }
           if (initialSelection == lastDraggedIndex) {
             minReached = lastDraggedIndex;
@@ -309,6 +366,8 @@ public class DragSelectRecyclerView extends RecyclerView {
         }
         return true;
       }
+    } else {
+      LOG("Drag selection is not active.");
     }
     return super.dispatchTouchEvent(e);
   }

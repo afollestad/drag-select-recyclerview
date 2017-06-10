@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <color name="colorPrimary">#009688</color>
-  <color name="colorPrimaryDark">#00796B</color>
+  <color name="colorPrimary">#FAFAFA</color>
+  <color name="colorPrimaryDark">#BDBDBD</color>
   <color name="colorAccent">#03A9F4</color>
 
   <color name="grid_label_text_normal">#FFF</color>

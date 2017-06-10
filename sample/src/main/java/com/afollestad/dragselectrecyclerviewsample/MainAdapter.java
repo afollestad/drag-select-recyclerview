@@ -6,15 +6,23 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
+
+import com.afollestad.dragselectrecyclerview.IDragSelectAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** @author Aidan Follestad (afollestad) */
-class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHolder> {
+class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder>
+    implements IDragSelectAdapter {
+
+  private final List<Integer> selectedIndices;
 
   private static final String[] ALPHABET =
       "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split(" ");
@@ -58,11 +66,30 @@ class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHold
 
   MainAdapter(ClickListener callback) {
     super();
+    this.selectedIndices = new ArrayList<>(16);
     this.callback = callback;
   }
 
   String getItem(int index) {
     return ALPHABET[index];
+  }
+
+  List<Integer> getSelectedIndices() {
+    return selectedIndices;
+  }
+
+  void toggleSelected(int index) {
+    if (selectedIndices.contains(index)) {
+      selectedIndices.remove((Integer) index);
+    } else {
+      selectedIndices.add(index);
+    }
+    notifyItemChanged(index);
+  }
+
+  void clearSelected() {
+    selectedIndices.clear();
+    notifyDataSetChanged();
   }
 
   @Override
@@ -74,14 +101,12 @@ class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHold
 
   @Override
   public void onBindViewHolder(MainViewHolder holder, int position) {
-    super.onBindViewHolder(holder, position);
-
     holder.label.setText(getItem(position));
 
     final Drawable d;
     final Context c = holder.itemView.getContext();
 
-    if (isIndexSelected(position)) {
+    if (selectedIndices.contains(position)) {
       d = new ColorDrawable(ContextCompat.getColor(c, R.color.grid_foreground_selected));
       holder.label.setTextColor(ContextCompat.getColor(c, R.color.grid_label_text_selected));
     } else {
@@ -95,6 +120,26 @@ class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHold
   }
 
   @Override
+  public void setSelected(int index, boolean selected) {
+    Log.d("MainAdapter", "setSelected(" + index + ", " + selected + ")");
+    if (!selected) {
+      selectedIndices.remove((Integer) index);
+    } else if (!selectedIndices.contains(index)) {
+      selectedIndices.add(index);
+    }
+  }
+
+  @Override
+  public boolean isIndexSelectable(int index) {
+    return true;
+  }
+
+  @Override
+  public void notifySelections() {
+    notifyDataSetChanged();
+  }
+
+  @Override
   public int getItemCount() {
     return ALPHABET.length;
   }
@@ -104,26 +149,29 @@ class MainAdapter extends DragSelectRecyclerViewAdapter<MainAdapter.MainViewHold
 
     private final TextView label;
     final RectangleView colorSquare;
-    private final ClickListener mCallback;
+    private final ClickListener callback;
 
     MainViewHolder(View itemView, ClickListener callback) {
       super(itemView);
-      mCallback = callback;
-
-      this.label = (TextView) itemView.findViewById(R.id.label);
-      this.colorSquare = (RectangleView) itemView.findViewById(R.id.colorSquare);
+      this.callback = callback;
+      this.label = itemView.findViewById(R.id.label);
+      this.colorSquare = itemView.findViewById(R.id.colorSquare);
       this.itemView.setOnClickListener(this);
       this.itemView.setOnLongClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-      if (mCallback != null) mCallback.onClick(getAdapterPosition());
+      if (callback != null) {
+        callback.onClick(getAdapterPosition());
+      }
     }
 
     @Override
     public boolean onLongClick(View v) {
-      if (mCallback != null) mCallback.onLongClick(getAdapterPosition());
+      if (callback != null) {
+        callback.onLongClick(getAdapterPosition());
+      }
       return true;
     }
   }
