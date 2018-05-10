@@ -55,7 +55,7 @@ dependencies {
 
 # Introduction
 
-`DragSelectRecyclerView` is the main classes of this library.
+`DragSelectRecyclerView` is the main class of this library.
 
 This library will handle drag interception and auto scroll logic - if you drag to the top of the RecyclerView,
 the list will scroll up, and vice versa.
