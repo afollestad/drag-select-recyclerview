@@ -1,36 +1,50 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.novoda.bintray-release'
 apply from: '../dependencies.gradle'
 
-ext {
-    PUBLISH_GROUP_ID = 'com.afollestad'
-    PUBLISH_ARTIFACT_ID = 'drag-select-recyclerview'
-    PUBLISH_VERSION = versions.publishVersion
-}
-
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
+  compileSdkVersion versions.compileSdk
+  buildToolsVersion versions.buildTools
 
-    defaultConfig {
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.compileSdk
-        versionCode versions.publishVersionCode
-        versionName versions.publishVersion
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  defaultConfig {
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.compileSdk
+    versionCode versions.publishVersionCode
+    versionName versions.publishVersion
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
-    lintOptions {
-        abortOnError false
-        checkReleaseBuilds false
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+  }
 }
 
 dependencies {
-    compile 'com.android.support:recyclerview-v7:' + versions.supportLib
+  repositories {
+    google()
+  }
+
+  implementation 'com.android.support:recyclerview-v7:' + versions.supportLib
 }
 
-apply from: 'https://raw.githubusercontent.com/afollestad/aidanfollestad.com/master/android-lib-release.gradle'
+publish {
+  userOrg = 'drummer-aidan'
+  groupId = 'com.afollestad'
+  artifactId = 'drag-select-recyclerview'
+  publishVersion = versions.publishVersion
+  website = 'https://github.com/afollestad/drag-select-recyclerview'
+  desc =
+      'Easy to implement Google Photos style multi-selection for RecyclerViews.'
+}
+repositories {
+  mavenCentral()
+}

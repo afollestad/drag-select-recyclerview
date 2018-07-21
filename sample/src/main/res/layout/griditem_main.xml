@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:padding="4dp">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="4dp"
+    >
 
   <com.afollestad.dragselectrecyclerviewsample.RectangleView
-    android:id="@+id/colorSquare"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TextView
-      android:id="@+id/label"
+      android:id="@+id/colorSquare"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:fontFamily="sans-serif-medium"
-      android:gravity="center"
-      android:textColor="#fff"
-      android:textSize="@dimen/main_label_textsize"
-      android:textStyle="bold|italic"
-      tools:ignore="UnusedAttribute"
-      tools:text="A"/>
+      >
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:textColor="#fff"
+        android:textSize="@dimen/main_label_textsize"
+        android:textStyle="bold|italic"
+        tools:ignore="UnusedAttribute"
+        tools:text="A"
+        />
 
   </com.afollestad.dragselectrecyclerviewsample.RectangleView>
 

@@ -1,31 +1,45 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 apply from: '../dependencies.gradle'
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
+  compileSdkVersion versions.compileSdk
+  buildToolsVersion versions.buildTools
 
-    lintOptions {
-        abortOnError false
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  defaultConfig {
+    applicationId "com.afollestad.dragselectrecyclerviewsample"
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.compileSdk
+    versionCode versions.publishVersionCode
+    versionName versions.publishVersion
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
-    defaultConfig {
-        applicationId "com.afollestad.dragselectrecyclerviewsample"
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.compileSdk
-        versionCode versions.publishVersionCode
-        versionName versions.publishVersion
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+  }
 }
 
 dependencies {
-    compile project(':library')
+  repositories {
+    google()
+  }
 
-    compile 'com.android.support:appcompat-v7:' + versions.supportLib
-    compile 'com.afollestad:material-cab:' + versions.materialCab
+  implementation project(':library')
+
+  implementation 'com.android.support:appcompat-v7:' + versions.supportLib
+  implementation 'com.afollestad:material-cab:' + versions.materialCab
+}
+
+repositories {
+  mavenCentral()
 }
