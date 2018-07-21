@@ -102,10 +102,10 @@ public class MainActivity extends AppCompatActivity
         traverse++;
       }
       Toast.makeText(
-          this,
-          String.format(
-              "Selected letters (%d): %s", adapter.getSelectedIndices().size(), sb.toString()),
-          Toast.LENGTH_LONG)
+              this,
+              String.format(
+                  "Selected letters (%d): %s", adapter.getSelectedIndices().size(), sb.toString()),
+              Toast.LENGTH_LONG)
           .show();
       adapter.clearSelected();
     }
