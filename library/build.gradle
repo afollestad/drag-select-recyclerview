@@ -33,7 +33,8 @@ dependencies {
     google()
   }
 
-  implementation 'com.android.support:recyclerview-v7:' + versions.supportLib
+  api 'com.android.support:recyclerview-v7:' + versions.supportLib
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 }
 
 publish {

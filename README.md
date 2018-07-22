@@ -3,17 +3,11 @@
 This library allows you to implement Google Photos style multi-selection in your apps! You start
 by long pressing an item in your list, then you drag your finger without letting go to select more.
 
-![Art](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/showcase2.gif)
+![Art](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/showcase3.gif)
 
 # Sample
 
-You can [download a sample APK](https://github.com/afollestad/drag-select-recyclerview/raw/master/sample/sample.apk) or 
-[view it on Google Play](https://play.google.com/store/apps/details?id=com.afollestad.dragselectrecyclerviewsample)!
-
-<a href="https://play.google.com/store/apps/details?id=com.afollestad.dragselectrecyclerviewsample">
-  <img alt="Get it on Google Play"
-       src="https://developer.android.com/images/brand/en_generic_rgb_wo_45.png" />
-</a>
+You can [download a sample APK](https://github.com/afollestad/drag-select-recyclerview/raw/master/sample/sample.apk).
 
 ---
 
@@ -33,161 +27,90 @@ Add the following to your module's `build.gradle` file:
 ```Gradle
 dependencies {
     // ... other dependencies
-    implementation 'com.afollestad:drag-select-recyclerview:1.0.0'
+    implementation 'com.afollestad:drag-select-recyclerview:2.0.0'
 }
 ```
 
 ---
 
-# Tutorial
-
-1. [Introduction](https://github.com/afollestad/drag-select-recyclerview#introduction)
-2. [DragSelectRecyclerView](https://github.com/afollestad/drag-select-recyclerview#dragselectrecyclerview)
-    1. How to create a DragSelectRecyclerView in your layout. How to set it up from code.
-3. [Adapter Implementation](https://github.com/afollestad/drag-select-recyclerview#adapter-implementation)
-    1. An example of how adapter's should be setup.
-4. [User Activation, Initializing Drag Selection](https://github.com/afollestad/drag-select-recyclerview#user-activation-initializing-drag-selection)
-    1. How drag selection mode is activated by a long press. How to maintain selected items through configuration changes, etc. 
-6. [Auto Scroll](https://github.com/afollestad/drag-select-recyclerview#auto-scroll)
-    1. By default, this library will auto-scroll up or down if the user holds their finger at the top or bottom of the list during selection mode.
-
----
-
 # Introduction
 
-`DragSelectRecyclerView` is the main class of this library.
+`DragSelectTouchListener` is the main class of this library.
 
 This library will handle drag interception and auto scroll logic - if you drag to the top of the RecyclerView,
 the list will scroll up, and vice versa.
 
 ---
 
-# DragSelectRecyclerView
+# DragSelectTouchListener
 
-`DragSelectRecyclerView` replaces the regular `RecyclerView` in your layouts. It intercepts touch events
-when you tell if selection mode is active, and automatically reports to your adapter.
+### Basics
 
-```xml
-<com.afollestad.dragselectrecyclerview.DragSelectRecyclerView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+`DragSelectTouchListener` attaches to your RecyclerViews. It intercepts touch events
+when it's active, and reports to a receiver which handles updating UI
+
+```kotlin
+val receiver: DragSelectReceiver = // ...
+val touchListener = DragSelectTouchListener.create(context, receiver)
 ```
 
-Setup is basically the same as it would be for a regular `RecyclerView`. You just set a `LayoutManager`
-and `RecyclerView.Adapter` to it:
+### Configuration
 
-```Java
-DragSelectRecyclerView list = (DragSelectRecyclerView) findViewById(R.id.list);
-list.setLayoutManager(new GridLayoutManager(this, 3));
-list.setAdapter(adapter);
+There are a few things that you can configure, mainly around auto scroll.
+
+```kotlin
+DragSelectTouchListener.create(context, adapter) {
+  // Configure the auto-scroll hotspot
+  hotspotHeight = resources.getDimensionPixelSize(R.dimen.default_56dp)
+  hotspotOffsetTop = resources.getDimensionPixelSize(R.dimen.default_zero)
+  hotspotOffsetBottom = resources.getDimensionPixelSize(R.dimen.default_zero)
+
+  // Or instead of the above...
+  disableAutoScroll()
+}
 ```
+
+The auto-scroll hotspot is a invisible section at the top and bottom of your
+RecyclerView, when your finger is in one of those sections, auto scroll is
+triggered and the list will move up or down until you lift your finger.
 
 ---
 
-# Adapter Implementation
+# Interaction
 
-You use regular `RecyclerView.Adapter`'s with the `DragSelectRecyclerView`. However, it **has to 
-implement the `IDragSelectAdapter` interface**:
+A receiver looks like this:
 
-```java
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder>
-      implements IDragSelectAdapter {
+```kotlin
+class MyReceiver : DragSelectReceiver {
 
-  @Override
-  public void setSelected(int index, boolean selected) {
-    // 1. Make this index as selected in your implementation.
-    // 2. Tell the RecyclerView.Adapter to render this item's changes.
-    notifyItemChanged(index);
+  override fun setSelected(index: Int, selected: Boolean) {
+    // do something to mark this index as selected/unselected
   }
   
-  @Override
-  public boolean isIndexSelectable(int index) {
-    // Return false if you don't want this position to be selectable.
-    // Useful for items like section headers.
-    return true;
-  }
- 
-  // The rest of your regular adapter overrides
-}
-```
-
-**Checkout the sample project for an in-depth example.**
-
----
-
-# User Activation, Initializing Drag Selection
-
-The library won't start selection mode unless you tell it to. You want the user to be able to active it.
-The click listener implementation setup in the adapter above will help with this.
-
-```java
-public class MainActivity extends AppCompatActivity implements
-      MainAdapter.ClickListener, DragSelectRecyclerViewAdapter.SelectionListener {
-
-  private DragSelectRecyclerView listView;
-  private MainAdapter adapter;
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-
-    // Setup adapter and callbacks
-    adapter = new MainAdapter(this);
-
-    // Setup the recycler view
-    listView = (DragSelectRecyclerView) findViewById(R.id.list);
-    listView.setLayoutManager(
-        new GridLayoutManager(this, 
-            getResources().getInteger(R.integer.grid_width)));
-    listView.setAdapter(adapter);
+  override fun isIndexSelectable(index: Int): Boolean {
+    // if you return false, this index can't be used with setIsActive()
+    return true
   }
 
-  /** 
-   * See the adapter in the sample project for a click listener implementation. Click listeners 
-   * aren't provided by this library.
-   */
-  @Override
-  public void onClick(int index) {
-    // Single click will select or deselect an item
-    adapter.toggleSelected(index);
-  }
-
-  /** 
-   * See the adapter in the sample project for a click listener implementation. Click listeners 
-   * aren't provided by this library.
-   */
-  @Override
-  public void onLongClick(int index) {
-    // Initialize drag selection -- also selects the initial item
-    listView.setDragSelectActive(true, index);
+  override fun getItemCount(): Int {
+    // return size of your data set
+    return 0
   }
 }
 ```
 
----
+In the sample project, our adapter is also our receiver.
 
-# Auto Scroll
+To start drag selection, you use `setIsActive`, which should be triggered
+from user input such as a long press on a list item.
 
-By default, this library will auto scroll. During drag selection, moving your finger to the top
-of the list will scroll up. Moving your finger to the bottom of the list will scroll down.
+```kotlin
+val recyclerView: RecyclerView = // ...
+val receiver: DragSelectReceiver = // ...
 
-At the start of the activation point at the top or bottom, the list will scroll slowly. The further
-you move into the activation area, the faster it will scroll.
+val touchListener = DragSelectTouchListener.create(context, receiver)
+recyclerView.addOnItemTouchListener(touchListener) // important!!
 
-You can disable auto scroll, or change the activation hotspot from your layout XML:
-
-```xml
-<com.afollestad.dragselectrecyclerview.DragSelectRecyclerView
-    android:id="@+id/list"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    app:dsrv_autoScrollEnabled="true"
-    app:dsrv_autoScrollHotspotHeight="56dp" />
-```
-
-56dp is the default hotspot height, you can raise or lower it if necessary. Smaller hotspots will
-scroll quickly since there's not much room for velocity change.
+// true for active = true, 0 is the initial selected index
+touchListener.setIsActive(true, 0)
+````

@@ -38,6 +38,7 @@ dependencies {
 
   implementation 'com.android.support:appcompat-v7:' + versions.supportLib
   implementation 'com.afollestad:material-cab:' + versions.materialCab
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 }
 
 repositories {
