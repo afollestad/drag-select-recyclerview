@@ -13,6 +13,10 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
+  compileOptions {
+    kotlinOptions.freeCompilerArgs += ['-module-name', "com.afollestad.drag-select-recyclerview"]
+  }
+
   defaultConfig {
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
