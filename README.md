@@ -62,8 +62,8 @@ There are a few things that you can configure, mainly around auto scroll.
 DragSelectTouchListener.create(context, adapter) {
   // Configure the auto-scroll hotspot
   hotspotHeight = resources.getDimensionPixelSize(R.dimen.default_56dp)
-  hotspotOffsetTop = resources.getDimensionPixelSize(R.dimen.default_zero)
-  hotspotOffsetBottom = resources.getDimensionPixelSize(R.dimen.default_zero)
+  hotspotOffsetTop = 0 // default
+  hotspotOffsetBottom = 0 // default
 
   // Or instead of the above...
   disableAutoScroll()
