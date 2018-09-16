@@ -2,4 +2,6 @@
   <string name="app_name">DragSelectRecyclerView</string>
   <string name="cab_title_x">Selection (%1$d)</string>
   <string name="done">Done</string>
+  <string name="range_selection">Range Selection</string>
+  <string name="path_selection">Path Selection</string>
 </resources>

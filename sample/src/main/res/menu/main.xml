@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <group android:checkableBehavior="single">
+    <item
+        android:id="@+id/range_selection"
+        android:title="@string/range_selection"
+        />
+    <item
+        android:id="@+id/path_selection"
+        android:title="@string/path_selection"
+        />
+  </group>
+
+</menu>

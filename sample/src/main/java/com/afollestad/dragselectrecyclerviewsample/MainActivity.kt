@@ -6,29 +6,45 @@
 package com.afollestad.dragselectrecyclerviewsample
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.afollestad.dragselectrecyclerview.DragSelectTouchListener
+import com.afollestad.dragselectrecyclerview.Mode.PATH
+import com.afollestad.dragselectrecyclerview.Mode.RANGE
 import com.afollestad.materialcab.MaterialCab
 import kotlinx.android.synthetic.main.activity_main.list
+import kotlinx.android.synthetic.main.activity_main.main_toolbar
 
 /** @author Aidan Follestad (afollestad) */
 class MainActivity : AppCompatActivity(), MainAdapter.Listener {
 
+  companion object {
+    const val KEY_PREFS = "drag-select-sample"
+    const val KEY_SELECTION_MODE = "selection-mode"
+  }
+
   private lateinit var adapter: MainAdapter
   private lateinit var touchListener: DragSelectTouchListener
+  private lateinit var prefs: SharedPreferences
 
   @SuppressLint("InlinedApi")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-    setSupportActionBar(findViewById(R.id.main_toolbar))
+    setSupportActionBar(main_toolbar)
+    prefs = prefs(KEY_PREFS)
 
+    // Setup adapter and touch listener
     adapter = MainAdapter(this)
-    touchListener = DragSelectTouchListener.create(this, adapter)
+    touchListener = DragSelectTouchListener.create(this, adapter) {
+      this.mode = prefs.getEnum(KEY_SELECTION_MODE, RANGE)
+    }
 
     // Setup the RecyclerView
     list.layoutManager = GridLayoutManager(this, integer(R.integer.grid_width))
@@ -37,6 +53,36 @@ class MainActivity : AppCompatActivity(), MainAdapter.Listener {
 
     MaterialCab.tryRestore(this, savedInstanceState)
     setLightNavBarCompat()
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    menuInflater.inflate(R.menu.main, menu)
+
+    val mode = prefs.getEnum(KEY_SELECTION_MODE, RANGE)
+    when (mode) {
+      RANGE -> menu.findItem(R.id.range_selection)
+          .isChecked = true
+      PATH -> menu.findItem(R.id.path_selection)
+          .isChecked = true
+    }
+
+    return super.onCreateOptionsMenu(menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+      R.id.range_selection -> {
+        prefs.edit { putEnum(KEY_SELECTION_MODE, RANGE) }
+        touchListener.mode = RANGE
+        invalidateOptionsMenu()
+      }
+      R.id.path_selection -> {
+        prefs.edit { putEnum(KEY_SELECTION_MODE, PATH) }
+        touchListener.mode = PATH
+        invalidateOptionsMenu()
+      }
+    }
+    return super.onOptionsItemSelected(item)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
