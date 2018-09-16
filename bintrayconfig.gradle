@@ -42,4 +42,5 @@ publish {
   desc = 'Easy to implement Google Photos style multi-selection for RecyclerViews.'
   website = 'https://github.com/afollestad/drag-select-recyclerview'
   dryRun = false
+  override = true
 }
