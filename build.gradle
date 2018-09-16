@@ -8,6 +8,7 @@ buildscript {
     google()
     jcenter()
   }
+
   dependencies {
     classpath 'com.android.tools.build:gradle:' + versions.gradlePlugin
     classpath "com.diffplug.spotless:spotless-plugin-gradle:" + versions.spotlessPlugin
@@ -30,31 +31,7 @@ allprojects {
     }
   }
 
-  apply plugin: "com.diffplug.gradle.spotless"
-  spotless {
-    java {
-      target "**/*.java"
-      trimTrailingWhitespace()
-      removeUnusedImports()
-      googleJavaFormat()
-      endWithNewline()
-    }
-  }
-
   tasks.withType(Javadoc).all {
     enabled = false
-  }
-}
-
-dependencyUpdates.resolutionStrategy = {
-  componentSelection { rules ->
-    rules.all { ComponentSelection selection ->
-      boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-        selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-      }
-      if (rejected) {
-        selection.reject('Release candidate')
-      }
-    }
   }
 }

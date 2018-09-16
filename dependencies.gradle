@@ -11,6 +11,6 @@ ext.versions = [
     versionsPlugin    : '0.17.0',
     bintrayRelease    : '0.8.1',
 
-    supportLib        : '28.0.+',
+    androidx          : '1.0.0-rc02',
     materialCab       : '1.1.0'
 ]

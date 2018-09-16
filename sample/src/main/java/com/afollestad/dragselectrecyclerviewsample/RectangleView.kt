@@ -1,3 +1,8 @@
+/*
+ * Licensed under Apache-2.0
+ *
+ * Designed and developed by Aidan Follestad (@afollestad)
+ */
 package com.afollestad.dragselectrecyclerviewsample
 
 import android.content.Context
@@ -6,7 +11,7 @@ import android.widget.FrameLayout
 
 /** @author Aidan Follestad (afollestad) */
 class RectangleView(
-  context: Context?,
+  context: Context,
   attrs: AttributeSet?
 ) : FrameLayout(context, attrs) {
 

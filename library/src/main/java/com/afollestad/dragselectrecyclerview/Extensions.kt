@@ -1,10 +1,15 @@
+/*
+ * Licensed under Apache-2.0
+ *
+ * Designed and developed by Aidan Follestad (@afollestad)
+ */
 package com.afollestad.dragselectrecyclerview
 
 import android.content.Context
-import android.support.annotation.DimenRes
-import android.support.annotation.Px
-import android.support.v7.widget.RecyclerView
 import android.view.MotionEvent
+import androidx.annotation.DimenRes
+import androidx.annotation.Px
+import androidx.recyclerview.widget.RecyclerView
 
 @Px internal fun Context.dimen(@DimenRes res: Int): Int {
   return resources.getDimensionPixelSize(res)

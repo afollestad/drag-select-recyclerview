@@ -1,17 +1,22 @@
+/*
+ * Licensed under Apache-2.0
+ *
+ * Designed and developed by Aidan Follestad (@afollestad)
+ */
 @file:Suppress("MemberVisibilityCanBePrivate")
 
 package com.afollestad.dragselectrecyclerview
 
 import android.content.Context
 import android.os.Handler
-import android.support.annotation.RestrictTo
-import android.support.annotation.RestrictTo.Scope
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.NO_POSITION
 import android.util.Log
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_UP
+import androidx.annotation.RestrictTo
+import androidx.annotation.RestrictTo.Scope
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 
 /** @author Aidan Follestad (afollestad) */
 class DragSelectTouchListener private constructor(

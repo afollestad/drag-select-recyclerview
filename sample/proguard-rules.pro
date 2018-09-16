@@ -1,8 +1,0 @@
--keepattributes SourceFile,LineNumberTable
--keep class android.support.v7.internal.view.menu.** {*;}
--keep class android.support.v7.widget.SearchView {*;}
--keep class android.support.v7.widget.ActionMenuPresenter {*;}
--keep class android.support.v7.widget.ActionMenuView {*;}
--keep class android.support.v7.widget.Toolbar {*;}
--dontwarn
--ignorewarnings

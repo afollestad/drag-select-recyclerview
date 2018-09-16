@@ -2,7 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: "com.github.ben-manes.versions"
 apply from: '../dependencies.gradle'
+
+apply from: '../bintrayconfig.gradle'
 
 android {
   compileSdkVersion versions.compileSdk
@@ -24,32 +27,15 @@ android {
     versionName versions.publishVersion
   }
 
-  buildTypes {
-    release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
+  packagingOptions {
+    exclude 'META-INF/library_release.kotlin_module'
+    exclude 'META-INF/proguard/androidx-annotations.pro'
   }
 }
 
 dependencies {
-  repositories {
-    google()
-  }
-
-  api 'com.android.support:recyclerview-v7:' + versions.supportLib
+  api 'androidx.recyclerview:recyclerview:' + versions.androidx
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 }
 
-publish {
-  userOrg = 'drummer-aidan'
-  groupId = 'com.afollestad'
-  artifactId = 'drag-select-recyclerview'
-  publishVersion = versions.publishVersion
-  website = 'https://github.com/afollestad/drag-select-recyclerview'
-  desc =
-      'Easy to implement Google Photos style multi-selection for RecyclerViews.'
-}
-repositories {
-  mavenCentral()
-}
+apply from: '../spotless.gradle'

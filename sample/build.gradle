@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: "com.github.ben-manes.versions"
 apply from: '../dependencies.gradle'
 
 android {
@@ -21,26 +22,18 @@ android {
     versionName versions.publishVersion
   }
 
-  buildTypes {
-    release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
+  packagingOptions {
+    exclude 'META-INF/sample_release.kotlin_module'
+    exclude 'META-INF/proguard/androidx-annotations.pro'
   }
 }
 
 dependencies {
-  repositories {
-    google()
-  }
-
   implementation project(':library')
 
-  implementation 'com.android.support:appcompat-v7:' + versions.supportLib
+  implementation 'androidx.appcompat:appcompat:' + versions.androidx
   implementation 'com.afollestad:material-cab:' + versions.materialCab
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 }
 
-repositories {
-  mavenCentral()
-}
+apply from: '../spotless.gradle'
