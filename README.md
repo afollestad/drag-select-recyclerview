@@ -3,7 +3,7 @@
 This library allows you to implement Google Photos style multi-selection in your apps! You start
 by long pressing an item in your list, then you drag your finger without letting go to select more.
 
-![Art](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/showcase3.gif)
+![Range Mode GIF](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/range.gif)
 
 # Sample
 
@@ -67,12 +67,21 @@ DragSelectTouchListener.create(context, adapter) {
 
   // Or instead of the above...
   disableAutoScroll()
+  
+  // The drag selection  mode, RANGE is the default
+  mode = RANGE
 }
 ```
 
 The auto-scroll hotspot is a invisible section at the top and bottom of your
 RecyclerView, when your finger is in one of those sections, auto scroll is
 triggered and the list will move up or down until you lift your finger.
+
+If you use `PATH` as the mode instead of `RANGE`, the behavior is a bit different:
+
+![Path Mode GIF](https://github.com/afollestad/drag-select-recyclerview/raw/master/art/path.gif)
+
+Compare it to the GIF at the top.
 
 ---
 

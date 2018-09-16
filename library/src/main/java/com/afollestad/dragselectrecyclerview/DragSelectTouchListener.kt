@@ -3,7 +3,7 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 package com.afollestad.dragselectrecyclerview
 
@@ -17,6 +17,13 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
+import com.afollestad.dragselectrecyclerview.Mode.PATH
+import com.afollestad.dragselectrecyclerview.Mode.RANGE
+
+enum class Mode {
+  RANGE,
+  PATH
+}
 
 /** @author Aidan Follestad (afollestad) */
 class DragSelectTouchListener private constructor(
@@ -40,6 +47,7 @@ class DragSelectTouchListener private constructor(
   var hotspotHeight: Int = context.dimen(R.dimen.dsrv_defaultHotspotHeight)
   var hotspotOffsetTop: Int = 0
   var hotspotOffsetBottom: Int = 0
+  var mode: Mode = RANGE
 
   fun disableAutoScroll() {
     hotspotHeight = -1
@@ -80,7 +88,10 @@ class DragSelectTouchListener private constructor(
       receiver: DragSelectReceiver,
       config: (DragSelectTouchListener.() -> Unit)? = null
     ): DragSelectTouchListener {
-      val listener = DragSelectTouchListener(context, receiver)
+      val listener = DragSelectTouchListener(
+          context = context,
+          receiver = receiver
+      )
       if (config != null) {
         listener.config()
       }
@@ -106,7 +117,10 @@ class DragSelectTouchListener private constructor(
       log("Index $initialSelection is not selectable.")
       return false
     }
-    receiver.setSelected(initialSelection, true)
+    receiver.setSelected(
+        index = initialSelection,
+        selected = true
+    )
     dragSelectActive = active
     this.initialSelection = initialSelection
     lastDraggedIndex = initialSelection
@@ -192,84 +206,98 @@ class DragSelectTouchListener private constructor(
         }
 
         // Drag selection logic
-        if (itemPosition != NO_POSITION && lastDraggedIndex != itemPosition) {
+        if (mode == PATH && itemPosition != NO_POSITION) {
+          // Non-default mode, we select exactly what the user touches over
+          if (lastDraggedIndex == itemPosition) return
+          lastDraggedIndex = itemPosition
+          receiver.setSelected(
+              index = lastDraggedIndex,
+              selected = !receiver.isSelected(lastDraggedIndex)
+          )
+          return
+        }
+
+        if (mode == RANGE &&
+            itemPosition != NO_POSITION &&
+            lastDraggedIndex != itemPosition
+        ) {
           lastDraggedIndex = itemPosition
           if (minReached == -1) minReached = lastDraggedIndex
           if (maxReached == -1) maxReached = lastDraggedIndex
           if (lastDraggedIndex > maxReached) maxReached = lastDraggedIndex
           if (lastDraggedIndex < minReached) minReached = lastDraggedIndex
-          selectRange(initialSelection, lastDraggedIndex, minReached, maxReached)
+          selectRange(
+              from = initialSelection,
+              to = lastDraggedIndex,
+              min = minReached,
+              max = maxReached
+          )
           if (initialSelection == lastDraggedIndex) {
             minReached = lastDraggedIndex
             maxReached = lastDraggedIndex
           }
         }
-
         return
       }
     }
   }
 
   @RestrictTo(Scope.LIBRARY_GROUP)
-  override fun onRequestDisallowInterceptTouchEvent(disallow: Boolean) {
-    // no-op
-  }
+  override fun onRequestDisallowInterceptTouchEvent(disallow: Boolean) = Unit
 
   private fun selectRange(
     from: Int,
     to: Int,
     min: Int,
     max: Int
-  ) {
-    with(receiver) {
-      if (from == to) {
-        // Finger is back on the initial item, unselect everything else
-        for (i in min..max) {
+  ) = with(receiver) {
+    if (from == to) {
+      // Finger is back on the initial item, unselect everything else
+      for (i in min..max) {
+        if (i == from) {
+          continue
+        }
+        setSelected(i, false)
+      }
+      return
+    }
+
+    if (to < from) {
+      // When selecting from one to previous items
+      for (i in to..from) {
+        setSelected(i, true)
+      }
+      if (min > -1 && min < to) {
+        // Unselect items that were selected during this drag but no longer are
+        for (i in min until to) {
           if (i == from) {
             continue
           }
           setSelected(i, false)
         }
-        return
       }
-
-      if (to < from) {
-        // When selecting from one to previous items
-        for (i in to..from) {
-          setSelected(i, true)
+      if (max > -1) {
+        for (i in from + 1..max) {
+          setSelected(i, false)
         }
-        if (min > -1 && min < to) {
-          // Unselect items that were selected during this drag but no longer are
-          for (i in min until to) {
-            if (i == from) {
-              continue
-            }
-            setSelected(i, false)
+      }
+    } else {
+      // When selecting from one to next items
+      for (i in from..to) {
+        setSelected(i, true)
+      }
+      if (max > -1 && max > to) {
+        // Unselect items that were selected during this drag but no longer are
+        for (i in to + 1..max) {
+          if (i == from) {
+            continue
           }
+          setSelected(i, false)
         }
-        if (max > -1) {
-          for (i in from + 1..max) {
-            setSelected(i, false)
-          }
-        }
-      } else {
-        // When selecting from one to next items
-        for (i in from..to) {
-          setSelected(i, true)
-        }
-        if (max > -1 && max > to) {
-          // Unselect items that were selected during this drag but no longer are
-          for (i in to + 1..max) {
-            if (i == from) {
-              continue
-            }
-            setSelected(i, false)
-          }
-        }
-        if (min > -1) {
-          for (i in min until from) {
-            setSelected(i, false)
-          }
+      }
+      if (min > -1) {
+        for (i in min until from) {
+          setSelected(i, false)
         }
       }
     }

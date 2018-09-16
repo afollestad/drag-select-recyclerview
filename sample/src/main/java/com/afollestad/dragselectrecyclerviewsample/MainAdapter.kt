@@ -100,6 +100,8 @@ class MainAdapter(private val callback: Listener?) :
     callback?.onSelectionChanged(selectedIndices.size)
   }
 
+  override fun isSelected(index: Int) = selectedIndices.contains(index)
+
   override fun isIndexSelectable(index: Int) = true
 
   override fun getItemCount() = ALPHABET.size

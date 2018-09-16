@@ -5,15 +5,19 @@
  */
 package com.afollestad.dragselectrecyclerview
 
+import androidx.annotation.CheckResult
+
 /** @author Aidan Follestad (afollestad) */
 interface DragSelectReceiver {
 
-  fun getItemCount(): Int
+  @CheckResult fun getItemCount(): Int
 
   fun setSelected(
     index: Int,
     selected: Boolean
   )
 
-  fun isIndexSelectable(index: Int): Boolean
+  @CheckResult fun isSelected(index: Int): Boolean
+
+  @CheckResult fun isIndexSelectable(index: Int): Boolean
 }
