@@ -48,6 +48,11 @@ class DragSelectTouchListener private constructor(
   var hotspotOffsetTop: Int = 0
   var hotspotOffsetBottom: Int = 0
   var mode: Mode = RANGE
+    set(mode) {
+      field = mode
+      // Shouldn't maintain an active state through mode changes
+      setIsActive(false, -1)
+    }
 
   fun disableAutoScroll() {
     hotspotHeight = -1
@@ -99,6 +104,12 @@ class DragSelectTouchListener private constructor(
     }
   }
 
+  /**
+   * Initializes drag selection.
+   *
+   * @param active True if we are starting drag selection, false to terminate it.
+   * @param initialSelection The index of the item which was pressed while starting drag selection.
+   */
   fun setIsActive(
     active: Boolean,
     initialSelection: Int
@@ -107,23 +118,35 @@ class DragSelectTouchListener private constructor(
       log("Drag selection is already active.")
       return false
     }
-    lastDraggedIndex = -1
-    minReached = -1
-    maxReached = -1
-    if (!receiver.isIndexSelectable(initialSelection)) {
-      dragSelectActive = false
+
+    this.lastDraggedIndex = -1
+    this.minReached = -1
+    this.maxReached = -1
+    this.autoScrollHandler.removeCallbacks(autoScrollRunnable)
+    this.inTopHotspot = false
+    this.inBottomHotspot = false
+
+    if (!active) {
+      // Don't do any of the initialization below since we are terminating
       this.initialSelection = -1
-      lastDraggedIndex = -1
+      return false
+    }
+
+    if (!receiver.isIndexSelectable(initialSelection)) {
+      this.dragSelectActive = false
+      this.initialSelection = -1
       log("Index $initialSelection is not selectable.")
       return false
     }
+
     receiver.setSelected(
         index = initialSelection,
         selected = true
     )
-    dragSelectActive = active
+    this.dragSelectActive = active
     this.initialSelection = initialSelection
-    lastDraggedIndex = initialSelection
+    this.lastDraggedIndex = initialSelection
+
     log("Drag selection initialized, starting at index $initialSelection.")
     return true
   }

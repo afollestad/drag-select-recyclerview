@@ -26,8 +26,8 @@ Add the following to your module's `build.gradle` file:
 
 ```Gradle
 dependencies {
-    // ... other dependencies
-    implementation 'com.afollestad:drag-select-recyclerview:2.0.0'
+
+  implementation 'com.afollestad:drag-select-recyclerview:2.0.0'
 }
 ```
 
@@ -94,6 +94,16 @@ class MyReceiver : DragSelectReceiver {
 
   override fun setSelected(index: Int, selected: Boolean) {
     // do something to mark this index as selected/unselected
+    if(selected && !selectedIndices.contains(index)) {
+      selectedIndices.add(index)
+    } else if(!selected) {
+      selectedIndices.remove(index)
+    }
+  }
+  
+  override fun isSelected(index: Int): Boolean {
+    // return true if this index is currently selected
+    return selectedItems.contains(index)
   }
   
   override fun isIndexSelectable(index: Int): Boolean {
