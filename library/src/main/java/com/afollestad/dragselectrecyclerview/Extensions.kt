@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
   return resources.getDimensionPixelSize(res)
 }
 
-typealias RecyclerViewAdapter<T> = RecyclerView.Adapter<T>
+internal typealias ListAdapter<T> = RecyclerView.Adapter<T>
 
-internal fun RecyclerViewAdapter<*>.isEmpty(): Boolean {
+internal fun ListAdapter<*>.isEmpty(): Boolean {
   return itemCount == 0
 }
 

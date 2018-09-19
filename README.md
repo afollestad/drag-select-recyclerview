@@ -64,11 +64,14 @@ DragSelectTouchListener.create(context, adapter) {
   hotspotHeight = resources.getDimensionPixelSize(R.dimen.default_56dp)
   hotspotOffsetTop = 0 // default
   hotspotOffsetBottom = 0 // default
+  
+  // Listen for auto scroll start/end
+  autoScrollListener = { isScrolling -> } 
 
   // Or instead of the above...
   disableAutoScroll()
   
-  // The drag selection  mode, RANGE is the default
+  // The drag selection mode, RANGE is the default
   mode = RANGE
 }
 ```

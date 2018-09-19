@@ -25,6 +25,8 @@ enum class Mode {
   PATH
 }
 
+typealias AutoScrollListener = (scrolling: Boolean) -> Unit
+
 /** @author Aidan Follestad (afollestad) */
 class DragSelectTouchListener private constructor(
   context: Context,
@@ -47,6 +49,8 @@ class DragSelectTouchListener private constructor(
   var hotspotHeight: Int = context.dimen(R.dimen.dsrv_defaultHotspotHeight)
   var hotspotOffsetTop: Int = 0
   var hotspotOffsetBottom: Int = 0
+  var autoScrollListener: AutoScrollListener? = null
+
   var mode: Mode = RANGE
     set(mode) {
       field = mode
@@ -76,6 +80,7 @@ class DragSelectTouchListener private constructor(
   private var inBottomHotspot: Boolean = false
 
   private var autoScrollVelocity: Int = 0
+  private var isAutoScrolling: Boolean = false
 
   companion object {
 
@@ -104,6 +109,13 @@ class DragSelectTouchListener private constructor(
     }
   }
 
+  private fun notifyAutoScrollListener(scrolling: Boolean) {
+    if (this.isAutoScrolling == scrolling) return
+    log(if (scrolling) "Auto scrolling is active" else "Auto scrolling is inactive")
+    this.isAutoScrolling = scrolling
+    this.autoScrollListener?.invoke(scrolling)
+  }
+
   /**
    * Initializes drag selection.
    *
@@ -123,6 +135,7 @@ class DragSelectTouchListener private constructor(
     this.minReached = -1
     this.maxReached = -1
     this.autoScrollHandler.removeCallbacks(autoScrollRunnable)
+    this.notifyAutoScrollListener(false)
     this.inTopHotspot = false
     this.inBottomHotspot = false
 
@@ -191,6 +204,7 @@ class DragSelectTouchListener private constructor(
         inTopHotspot = false
         inBottomHotspot = false
         autoScrollHandler.removeCallbacks(autoScrollRunnable)
+        this.notifyAutoScrollListener(false)
         return
       }
       ACTION_MOVE -> {
@@ -203,6 +217,7 @@ class DragSelectTouchListener private constructor(
               log("Now in TOP hotspot")
               autoScrollHandler.removeCallbacks(autoScrollRunnable)
               autoScrollHandler.postDelayed(autoScrollRunnable, AUTO_SCROLL_DELAY.toLong())
+              this.notifyAutoScrollListener(true)
             }
             val simulatedFactor = (hotspotTopBoundEnd - hotspotTopBoundStart).toFloat()
             val simulatedY = y - hotspotTopBoundStart
@@ -215,6 +230,7 @@ class DragSelectTouchListener private constructor(
               log("Now in BOTTOM hotspot")
               autoScrollHandler.removeCallbacks(autoScrollRunnable)
               autoScrollHandler.postDelayed(autoScrollRunnable, AUTO_SCROLL_DELAY.toLong())
+              this.notifyAutoScrollListener(true)
             }
             val simulatedY = y + hotspotBottomBoundEnd
             val simulatedFactor = (hotspotBottomBoundStart + hotspotBottomBoundEnd).toFloat()
@@ -223,6 +239,7 @@ class DragSelectTouchListener private constructor(
           } else if (inTopHotspot || inBottomHotspot) {
             log("Left the hotspot")
             autoScrollHandler.removeCallbacks(autoScrollRunnable)
+            this.notifyAutoScrollListener(false)
             inTopHotspot = false
             inBottomHotspot = false
           }
