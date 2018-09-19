@@ -11,11 +11,6 @@ android {
   buildToolsVersion versions.buildTools
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
-  compileOptions {
     kotlinOptions.freeCompilerArgs += ['-module-name', "com.afollestad.drag-select-recyclerview"]
   }
 
@@ -27,8 +22,7 @@ android {
   }
 
   packagingOptions {
-    exclude 'META-INF/library_release.kotlin_module'
-    exclude 'META-INF/proguard/androidx-annotations.pro'
+    pickFirst 'META-INF/proguard/androidx-annotations.pro'
   }
 }
 
