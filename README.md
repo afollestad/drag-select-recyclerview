@@ -27,7 +27,7 @@ Add the following to your module's `build.gradle` file:
 ```Gradle
 dependencies {
 
-  implementation 'com.afollestad:drag-select-recyclerview:2.2.0'
+  implementation 'com.afollestad:drag-select-recyclerview:2.3.0'
 }
 ```
 
