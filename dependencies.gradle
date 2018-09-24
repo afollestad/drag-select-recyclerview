@@ -7,10 +7,10 @@ ext.versions = [
 
     gradlePlugin      : '3.2.0',
     kotlin            : '1.2.70',
-    spotlessPlugin    : '3.12.0',
-    versionsPlugin    : '0.17.0',
+    spotlessPlugin    : '3.15.0',
+    versionsPlugin    : '0.20.0',
     bintrayRelease    : '0.8.1',
 
     androidx          : '1.0.0',
-    materialCab       : '1.2.0'
+    materialCab       : '1.3.0'
 ]
