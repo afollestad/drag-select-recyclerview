@@ -3,7 +3,7 @@ ext.versions = [
     compileSdk        : 28,
     buildTools        : '28.0.3',
     publishVersion    : '2.3.0',
-    publishVersionCode: 25,
+    publishVersionCode: 26,
     
     gradlePlugin      : '3.2.1',
     kotlin            : '1.3.10',
@@ -12,5 +12,5 @@ ext.versions = [
     bintrayRelease    : '0.9',
 
     androidx          : '1.0.0',
-    materialCab       : '1.3.0'
+    materialCab       : '1.3.1'
 ]
