@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-  api 'androidx.recyclerview:recyclerview:' + versions.androidx
+  api 'androidx.recyclerview:recyclerview:' + versions.androidxRecyclerView
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 }
 
