@@ -196,7 +196,7 @@ class DragSelectTouchListener private constructor(
       }
     }
 
-    if(result && event.action == ACTION_UP){
+    if (result && event.action == ACTION_UP) {
       onDragSelectionStop()
     }
     return result
