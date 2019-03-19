@@ -15,140 +15,187 @@
  */
 package com.afollestad.dragselectrecyclerviewsample
 
-import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.afollestad.dragselectrecyclerview.DragSelectTouchListener
+import com.afollestad.dragselectrecyclerview.Mode
 import com.afollestad.dragselectrecyclerview.Mode.PATH
 import com.afollestad.dragselectrecyclerview.Mode.RANGE
-import com.afollestad.materialcab.MaterialCab
+import com.afollestad.materialcab.attached.AttachedCab
+import com.afollestad.materialcab.attached.destroy
+import com.afollestad.materialcab.attached.isActive
+import com.afollestad.materialcab.createCab
+import com.afollestad.recyclical.datasource.emptySelectableDataSource
+import com.afollestad.recyclical.setup
+import com.afollestad.recyclical.viewholder.isSelected
+import com.afollestad.recyclical.withItem
+import com.afollestad.rxkprefs.Pref
+import com.afollestad.rxkprefs.rxkPrefs
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.activity_main.main_toolbar
 
 /** @author Aidan Follestad (afollestad) */
-class MainActivity : AppCompatActivity(), MainAdapter.Listener {
+class MainActivity : AppCompatActivity() {
 
-  companion object {
-    const val KEY_PREFS = "drag-select-sample"
+  private companion object {
     const val KEY_SELECTION_MODE = "selection-mode"
+
+    val COLORS = intArrayOf(
+        Color.parseColor("#F44336"), Color.parseColor("#E91E63"), Color.parseColor("#9C27B0"),
+        Color.parseColor("#673AB7"), Color.parseColor("#3F51B5"), Color.parseColor("#2196F3"),
+        Color.parseColor("#03A9F4"), Color.parseColor("#00BCD4"), Color.parseColor("#009688"),
+        Color.parseColor("#4CAF50"), Color.parseColor("#8BC34A"), Color.parseColor("#CDDC39"),
+        Color.parseColor("#FFEB3B"), Color.parseColor("#FFC107"), Color.parseColor("#FF9800"),
+        Color.parseColor("#FF5722"), Color.parseColor("#795548"), Color.parseColor("#9E9E9E"),
+        Color.parseColor("#607D8B"), Color.parseColor("#F44336"), Color.parseColor("#E91E63"),
+        Color.parseColor("#9C27B0"), Color.parseColor("#673AB7"), Color.parseColor("#3F51B5"),
+        Color.parseColor("#2196F3"), Color.parseColor("#03A9F4")
+    )
   }
 
-  private lateinit var adapter: MainAdapter
-  private lateinit var touchListener: DragSelectTouchListener
-  private lateinit var prefs: SharedPreferences
+  private val dataSource = emptySelectableDataSource().apply {
+    onSelectionChange { invalidateCab() }
+  }
+  private val selectionModePref: Pref<Mode> by lazy {
+    rxkPrefs(this).enum(
+        KEY_SELECTION_MODE,
+        RANGE,
+        { Mode.valueOf(it) },
+        { it.name }
+    )
+  }
 
-  @SuppressLint("InlinedApi")
+  private lateinit var touchListener: DragSelectTouchListener
+
+  private var activeCab: AttachedCab? = null
+  private var selectionModeSubscription: Disposable? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
     setSupportActionBar(main_toolbar)
-    prefs = prefs(KEY_PREFS)
 
     // Setup adapter and touch listener
-    adapter = MainAdapter(this)
-    touchListener = DragSelectTouchListener.create(this, adapter) {
-      this.mode = prefs.getEnum(KEY_SELECTION_MODE, RANGE)
+    touchListener = DragSelectTouchListener.create(
+        this,
+        dataSource.asDragSelectReceiver()
+    ) {
+      this.mode = selectionModePref.get()
     }
 
-    // Setup the RecyclerView
-    list.layoutManager = GridLayoutManager(this, integer(R.integer.grid_width))
-    list.adapter = adapter
+    selectionModeSubscription = selectionModePref.observe()
+        .filter { it != touchListener.mode }
+        .subscribe {
+          touchListener.mode = it
+          invalidateOptionsMenu()
+        }
+
+    dataSource.set(
+        "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split(" ")
+            .dropLastWhile { it.isEmpty() }
+            .map(::MainItem)
+    )
+
+    list.setup {
+      withLayoutManager(GridLayoutManager(this@MainActivity, integer(R.integer.grid_width)))
+      withDataSource(dataSource)
+
+      withItem<MainItem>(R.layout.griditem_main) {
+        onBind(::MainViewHolder) { index, item ->
+          label.text = item.letter
+          colorSquare.setBackgroundColor(COLORS[index])
+
+          val context = itemView.context
+          var foreground: Drawable? = null
+          if (isSelected()) {
+            foreground = ColorDrawable(context.color(R.color.grid_foreground_selected))
+            label.setTextColor(context.color(R.color.grid_label_text_selected))
+          } else {
+            label.setTextColor(context.color(R.color.grid_label_text_normal))
+          }
+          colorSquare.foreground = foreground
+        }
+        onClick { _, _ -> toggleSelection() }
+        onLongClick { index, _ ->
+          touchListener.setIsActive(true, index)
+        }
+      }
+    }
     list.addOnItemTouchListener(touchListener)
 
-    MaterialCab.tryRestore(this, savedInstanceState)
     setLightNavBarCompat()
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.main, menu)
-
-    val mode = prefs.getEnum(KEY_SELECTION_MODE, RANGE)
-    when (mode) {
+    when (selectionModePref.get()) {
       RANGE -> menu.findItem(R.id.range_selection)
           .isChecked = true
       PATH -> menu.findItem(R.id.path_selection)
           .isChecked = true
     }
-
     return super.onCreateOptionsMenu(menu)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
-      R.id.range_selection -> {
-        prefs.edit { putEnum(KEY_SELECTION_MODE, RANGE) }
-        touchListener.mode = RANGE
-        invalidateOptionsMenu()
-      }
-      R.id.path_selection -> {
-        prefs.edit { putEnum(KEY_SELECTION_MODE, PATH) }
-        touchListener.mode = PATH
-        invalidateOptionsMenu()
-      }
+      R.id.range_selection -> selectionModePref.set(RANGE)
+      R.id.path_selection -> selectionModePref.set(PATH)
     }
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onSaveInstanceState(outState: Bundle) {
-    super.onSaveInstanceState(outState)
-    MaterialCab.saveState(outState)
-  }
-
-  override fun onClick(index: Int) {
-    adapter.toggleSelected(index)
-  }
-
-  override fun onLongClick(index: Int) {
-    touchListener.setIsActive(true, index)
-  }
-
-  override fun onSelectionChanged(count: Int) {
-    if (count > 0) {
-      MaterialCab.attach(this, R.id.cab_stub) {
-        menuRes = R.menu.cab
-        closeDrawableRes = R.drawable.ic_close
-        titleColor = Color.BLACK
-        title = getString(R.string.cab_title_x, count)
-
-        onSelection {
-          if (it.itemId == R.id.done) {
-            val sb = StringBuilder()
-            for ((traverse, index) in adapter.selectedIndices.withIndex()) {
-              if (traverse > 0) sb.append(", ")
-              sb.append(adapter[index])
-            }
-            Toast.makeText(
-                this@MainActivity,
-                "Selected letters (${adapter.selectedIndices.size}): $sb",
-                Toast.LENGTH_LONG
-            )
-                .show()
-            adapter.clearSelected()
-            true
-          } else {
-            false
-          }
-        }
-
-        onDestroy {
-          adapter.clearSelected()
-          true
-        }
-      }
-    } else {
-      MaterialCab.destroy()
+  override fun onBackPressed() {
+    if (!activeCab.destroy()) {
+      super.onBackPressed()
     }
   }
 
-  override fun onBackPressed() {
-    if (!MaterialCab.destroy()) {
-      super.onBackPressed()
+  override fun onDestroy() {
+    selectionModeSubscription?.dispose()
+    super.onDestroy()
+  }
+
+  private fun invalidateCab() {
+    if (dataSource.hasSelection()) {
+      val count = dataSource.getSelectionCount()
+      if (activeCab.isActive()) {
+        activeCab?.title(literal = getString(R.string.cab_title_x, count))
+      } else {
+        activeCab = createCab(R.id.cab_stub) {
+          menu(R.menu.cab)
+          closeDrawable(R.drawable.ic_close)
+          titleColor(literal = Color.BLACK)
+          title(literal = getString(R.string.cab_title_x, count))
+
+          onSelection {
+            if (it.itemId == R.id.done) {
+              val selectionString = (0 until dataSource.size())
+                  .filter { index -> dataSource.isSelectedAt(index) }
+                  .joinToString()
+              toast("Selected letters: $selectionString")
+              dataSource.deselectAll()
+              true
+            } else {
+              false
+            }
+          }
+
+          onDestroy {
+            dataSource.deselectAll()
+            true
+          }
+        }
+      }
+    } else {
+      activeCab.destroy()
     }
   }
 }

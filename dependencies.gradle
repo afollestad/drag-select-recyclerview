@@ -1,17 +1,20 @@
 ext.versions = [
-    minSdk              : 14,
+    minSdk              : 19,
     compileSdk          : 28,
     buildTools          : '28.0.3',
     publishVersion      : '2.3.0',
     publishVersionCode  : 26,
 
-    gradlePlugin        : '3.3.1',
+    gradlePlugin        : '3.3.2',
     kotlin              : '1.3.21',
-    spotlessPlugin      : '3.18.0',
-    versionsPlugin      : '0.20.0',
+    spotlessPlugin      : '3.20.0',
+    versionsPlugin      : '0.21.0',
     bintrayRelease      : '0.9',
 
     androidxCore        : '1.0.2',
     androidxRecyclerView: '1.0.0',
-    materialCab         : '1.3.1'
+    materialCab         : '2.0.1',
+    recyclical          : '0.5.1',
+    rxkprefs            : '1.2.5',
+    rxJava              : '2.2.7'
 ]
