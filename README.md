@@ -1,5 +1,9 @@
 # Drag Select Recycler View
 
+[ ![jCenter](https://api.bintray.com/packages/drummer-aidan/maven/drag-select-recyclerview/images/download.svg) ](https://bintray.com/drummer-aidan/maven/drag-select-recyclerview/_latestVersion)
+[![Build Status](https://travis-ci.org/afollestad/drag-select-recyclerview.svg)](https://travis-ci.org/afollestad/drag-select-recyclerview)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
+
 This library allows you to implement Google Photos style multi-selection in your apps! You start
 by long pressing an item in your list, then you drag your finger without letting go to select more.
 
@@ -12,10 +16,6 @@ You can [download a sample APK](https://github.com/afollestad/drag-select-recycl
 ---
 
 # Gradle Dependency
-
-[ ![jCenter](https://api.bintray.com/packages/drummer-aidan/maven/drag-select-recyclerview/images/download.svg) ](https://bintray.com/drummer-aidan/maven/drag-select-recyclerview/_latestVersion)
-[![Build Status](https://travis-ci.org/afollestad/drag-select-recyclerview.svg)](https://travis-ci.org/afollestad/drag-select-recyclerview)
-[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 The Gradle dependency is available via [jCenter](https://bintray.com/drummer-aidan/maven/material-camera/view).
 jCenter is the default Maven repository used by Android Studio.
