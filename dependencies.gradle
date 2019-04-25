@@ -5,16 +5,16 @@ ext.versions = [
     publishVersion      : '2.4.0',
     publishVersionCode  : 27,
 
-    gradlePlugin        : '3.3.2',
-    kotlin              : '1.3.30',
-    spotlessPlugin      : '3.20.0',
+    gradlePlugin        : '3.4.0',
+    kotlin              : '1.3.31',
+    spotlessPlugin      : '3.22.0',
     versionsPlugin      : '0.21.0',
     bintrayRelease      : '0.9',
 
     androidxCore        : '1.0.2',
     androidxRecyclerView: '1.0.0',
     materialCab         : '2.0.1',
-    recyclical          : '0.5.1',
+    recyclical          : '0.7.2',
     rxkprefs            : '1.2.5',
     rxJava              : '2.2.7'
 ]
