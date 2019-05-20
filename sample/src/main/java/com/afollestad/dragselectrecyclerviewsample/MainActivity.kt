@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
       withLayoutManager(GridLayoutManager(this@MainActivity, integer(R.integer.grid_width)))
       withDataSource(dataSource)
 
-      withItem<MainItem>(R.layout.griditem_main) {
+      withItem<MainItem, MainViewHolder>(R.layout.griditem_main) {
         onBind(::MainViewHolder) { index, item ->
           label.text = item.letter
           colorSquare.setBackgroundColor(COLORS[index])
@@ -122,10 +122,8 @@ class MainActivity : AppCompatActivity() {
           }
           colorSquare.foreground = foreground
         }
-        onClick { _, _ -> toggleSelection() }
-        onLongClick { index, _ ->
-          touchListener.setIsActive(true, index)
-        }
+        onClick { toggleSelection() }
+        onLongClick { touchListener.setIsActive(true, it) }
       }
     }
     list.addOnItemTouchListener(touchListener)

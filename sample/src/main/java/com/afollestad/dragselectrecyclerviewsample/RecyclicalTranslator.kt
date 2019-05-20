@@ -18,7 +18,7 @@ package com.afollestad.dragselectrecyclerviewsample
 import com.afollestad.dragselectrecyclerview.DragSelectReceiver
 import com.afollestad.recyclical.datasource.SelectableDataSource
 
-fun SelectableDataSource.asDragSelectReceiver(): DragSelectReceiver {
+fun SelectableDataSource<*>.asDragSelectReceiver(): DragSelectReceiver {
   return object : DragSelectReceiver {
     override fun getItemCount(): Int = size()
 
