@@ -22,7 +22,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.dragselectrecyclerview.DragSelectTouchListener
 import com.afollestad.dragselectrecyclerview.Mode
 import com.afollestad.dragselectrecyclerview.Mode.PATH
@@ -36,30 +38,13 @@ import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.viewholder.isSelected
 import com.afollestad.recyclical.withItem
 import com.afollestad.rxkprefs.Pref
+import com.afollestad.rxkprefs.rxjava.observe
 import com.afollestad.rxkprefs.rxkPrefs
-import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_main.list
-import kotlinx.android.synthetic.main.activity_main.main_toolbar
+import io.reactivex.disposables.SerialDisposable
 
 /** @author Aidan Follestad (afollestad) */
 class MainActivity : AppCompatActivity() {
-
-  private companion object {
-    const val KEY_SELECTION_MODE = "selection-mode"
-
-    val COLORS = intArrayOf(
-        Color.parseColor("#F44336"), Color.parseColor("#E91E63"), Color.parseColor("#9C27B0"),
-        Color.parseColor("#673AB7"), Color.parseColor("#3F51B5"), Color.parseColor("#2196F3"),
-        Color.parseColor("#03A9F4"), Color.parseColor("#00BCD4"), Color.parseColor("#009688"),
-        Color.parseColor("#4CAF50"), Color.parseColor("#8BC34A"), Color.parseColor("#CDDC39"),
-        Color.parseColor("#FFEB3B"), Color.parseColor("#FFC107"), Color.parseColor("#FF9800"),
-        Color.parseColor("#FF5722"), Color.parseColor("#795548"), Color.parseColor("#9E9E9E"),
-        Color.parseColor("#607D8B"), Color.parseColor("#F44336"), Color.parseColor("#E91E63"),
-        Color.parseColor("#9C27B0"), Color.parseColor("#673AB7"), Color.parseColor("#3F51B5"),
-        Color.parseColor("#2196F3"), Color.parseColor("#03A9F4")
-    )
-  }
-
+  private val list by lazy { findViewById<RecyclerView>(R.id.list) }
   private val dataSource = emptySelectableDataSource().apply {
     onSelectionChange { invalidateCab() }
   }
@@ -75,12 +60,12 @@ class MainActivity : AppCompatActivity() {
   private lateinit var touchListener: DragSelectTouchListener
 
   private var activeCab: AttachedCab? = null
-  private var selectionModeSubscription: Disposable? = null
+  private var selectionModeDisposable = SerialDisposable()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-    setSupportActionBar(main_toolbar)
+    setSupportActionBar(findViewById<Toolbar>(R.id.main_toolbar))
 
     // Setup adapter and touch listener
     touchListener = DragSelectTouchListener.create(
@@ -90,15 +75,17 @@ class MainActivity : AppCompatActivity() {
       this.mode = selectionModePref.get()
     }
 
-    selectionModeSubscription = selectionModePref.observe()
-        .filter { it != touchListener.mode }
-        .subscribe {
-          touchListener.mode = it
-          invalidateOptionsMenu()
-        }
+    selectionModeDisposable.set(
+        selectionModePref.observe()
+            .filter { it != touchListener.mode }
+            .subscribe {
+              touchListener.mode = it
+              invalidateOptionsMenu()
+            }
+    )
 
     dataSource.set(
-        "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split(" ")
+        ALPHABET
             .dropLastWhile { it.isEmpty() }
             .map(::MainItem)
     )
@@ -157,7 +144,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onDestroy() {
-    selectionModeSubscription?.dispose()
+    selectionModeDisposable.dispose()
     super.onDestroy()
   }
 
@@ -197,3 +184,23 @@ class MainActivity : AppCompatActivity() {
     }
   }
 }
+
+const val KEY_SELECTION_MODE = "selection-mode"
+
+val ALPHABET = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    .split(" ")
+val COLORS = intArrayOf(
+    Color.parseColor("#F44336"), Color.parseColor("#E91E63"),
+    Color.parseColor("#9C27B0"), Color.parseColor("#673AB7"),
+    Color.parseColor("#3F51B5"), Color.parseColor("#2196F3"),
+    Color.parseColor("#03A9F4"), Color.parseColor("#00BCD4"),
+    Color.parseColor("#009688"), Color.parseColor("#4CAF50"),
+    Color.parseColor("#8BC34A"), Color.parseColor("#CDDC39"),
+    Color.parseColor("#FFEB3B"), Color.parseColor("#FFC107"),
+    Color.parseColor("#FF9800"), Color.parseColor("#FF5722"),
+    Color.parseColor("#795548"), Color.parseColor("#9E9E9E"),
+    Color.parseColor("#607D8B"), Color.parseColor("#F44336"),
+    Color.parseColor("#E91E63"), Color.parseColor("#9C27B0"),
+    Color.parseColor("#673AB7"), Color.parseColor("#3F51B5"),
+    Color.parseColor("#2196F3"), Color.parseColor("#03A9F4")
+)

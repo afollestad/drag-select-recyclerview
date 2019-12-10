@@ -1,20 +1,37 @@
 ext.versions = [
-    minSdk              : 19,
-    compileSdk          : 29,
-    buildTools          : '29.0.0',
-    publishVersion      : '2.4.0',
-    publishVersionCode  : 27,
+    min_sdk: 19,
+    compile_sdk: 29,
+    build_tools: '29.0.0',
+    publish_version: '2.4.0',
+    publish_version_code: 27
+]
 
-    gradlePlugin        : '3.4.2',
-    kotlin              : '1.3.41',
-    spotlessPlugin      : '3.23.1',
-    versionsPlugin      : '0.21.0',
-    bintrayRelease      : '0.9.1',
+ext.deps = [
+    gradle_plugins: [
+        android: "com.android.tools.build:gradle:3.5.2",
+        kotlin: "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61",
+        spotless: "com.diffplug.spotless:spotless-plugin-gradle:3.26.1",
+        versions: "com.github.ben-manes:gradle-versions-plugin:0.27.0",
+        bintray_release: "com.novoda:bintray-release:0.9.2"
+    ],
 
-    androidxCore        : '1.0.2',
-    androidxRecyclerView: '1.0.0',
-    materialCab         : '2.0.1',
-    recyclical          : '1.0.0',
-    rxkprefs            : '1.2.5',
-    rxJava              : '2.2.9'
+    androidx: [
+        core: "androidx.appcompat:appcompat:1.1.0",
+        recycler_view: "androidx.recyclerview:recyclerview:1.1.0"
+    ],
+
+    afollestad: [
+        material_cab: "com.afollestad:material-cab:2.0.1",
+        recyclical: "com.afollestad:recyclical:1.1.1",
+        rxkprefs: [
+            core: "com.afollestad.rxkprefs:core:2.0.1",
+            rxjava: "com.afollestad.rxkprefs:rxjava:2.0.1"
+        ]
+    ],
+
+    kotlin: [
+        stdlib8: "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    ],
+
+    rxjava: "io.reactivex.rxjava2:rxjava:2.2.9"
 ]

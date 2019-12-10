@@ -1,33 +1,9 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply from: '../dependencies.gradle'
+ext.module_group = "com.afollestad"
+ext.module_name = "drag-select-recyclerview"
 
-apply from: '../bintrayconfig.gradle'
-
-android {
-  compileSdkVersion versions.compileSdk
-  buildToolsVersion versions.buildTools
-
-  compileOptions {
-    kotlinOptions.freeCompilerArgs += ['-module-name', "com.afollestad.drag-select-recyclerview"]
-  }
-
-  defaultConfig {
-    minSdkVersion versions.minSdk
-    targetSdkVersion versions.compileSdk
-    versionCode versions.publishVersionCode
-    versionName versions.publishVersion
-  }
-
-  packagingOptions {
-    pickFirst 'META-INF/proguard/androidx-annotations.pro'
-  }
-}
+apply from: rootProject.file("gradle/android_library_config.gradle")
 
 dependencies {
-  api 'androidx.recyclerview:recyclerview:' + versions.androidxRecyclerView
-  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:' + versions.kotlin
+  api deps.androidx.recycler_view
+  implementation deps.kotlin.stdlib8
 }
-
-apply from: '../spotless.gradle'
