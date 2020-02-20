@@ -1,7 +1,7 @@
 # Drag Select Recycler View
 
 [ ![jCenter](https://api.bintray.com/packages/drummer-aidan/maven/drag-select-recyclerview/images/download.svg) ](https://bintray.com/drummer-aidan/maven/drag-select-recyclerview/_latestVersion)
-[![Build Status](https://travis-ci.org/afollestad/drag-select-recyclerview.svg)](https://travis-ci.org/afollestad/drag-select-recyclerview)
+[![Android CI](https://github.com/afollestad/drag-select-recyclerview/workflows/Android%20CI/badge.svg)](https://github.com/afollestad/drag-select-recyclerview/actions?query=workflow%3A%22Android+CI%22)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 This library allows you to implement Google Photos style multi-selection in your apps! You start
