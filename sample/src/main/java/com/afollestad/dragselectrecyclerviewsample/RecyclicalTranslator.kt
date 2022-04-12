@@ -20,7 +20,6 @@ import com.afollestad.recyclical.datasource.SelectableDataSource
 
 fun SelectableDataSource<*>.asDragSelectReceiver(): DragSelectReceiver {
   return object : DragSelectReceiver {
-    override fun getItemCount(): Int = size()
 
     override fun setSelected(
       index: Int,
@@ -31,6 +30,6 @@ fun SelectableDataSource<*>.asDragSelectReceiver(): DragSelectReceiver {
 
     override fun isSelected(index: Int): Boolean = isSelectedAt(index)
 
-    override fun isIndexSelectable(index: Int): Boolean = true
+    override fun isSelectable(index: Int): Boolean = true
   }
 }
