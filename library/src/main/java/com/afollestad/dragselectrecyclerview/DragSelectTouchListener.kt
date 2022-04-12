@@ -36,6 +36,7 @@ enum class Mode {
 }
 
 typealias AutoScrollListener = (scrolling: Boolean) -> Unit
+typealias DragToSelectListener = (active: Boolean) -> Unit
 
 /** @author Aidan Follestad (afollestad) */
 class DragSelectTouchListener private constructor(
@@ -46,12 +47,14 @@ class DragSelectTouchListener private constructor(
   private val autoScrollHandler = Handler()
   private val autoScrollRunnable = object : Runnable {
     override fun run() {
-      if (inTopHotspot) {
-        recyclerView?.scrollBy(0, -autoScrollVelocity)
-        autoScrollHandler.postDelayed(this, AUTO_SCROLL_DELAY.toLong())
-      } else if (inBottomHotspot) {
-        recyclerView?.scrollBy(0, autoScrollVelocity)
-        autoScrollHandler.postDelayed(this, AUTO_SCROLL_DELAY.toLong())
+      if (dragSelectActive) {
+        if (inTopHotspot) {
+          recyclerView?.scrollBy(0, -autoScrollVelocity)
+          autoScrollHandler.postDelayed(this, AUTO_SCROLL_DELAY.toLong())
+        } else if (inBottomHotspot) {
+          recyclerView?.scrollBy(0, autoScrollVelocity)
+          autoScrollHandler.postDelayed(this, AUTO_SCROLL_DELAY.toLong())
+        }
       }
     }
   }
@@ -60,6 +63,7 @@ class DragSelectTouchListener private constructor(
   var hotspotOffsetTop: Int = 0
   var hotspotOffsetBottom: Int = 0
   var autoScrollListener: AutoScrollListener? = null
+  var dragToSelectListener: DragToSelectListener? = null
 
   var mode: Mode = RANGE
     set(mode) {
@@ -136,6 +140,11 @@ class DragSelectTouchListener private constructor(
     active: Boolean,
     initialSelection: Int
   ): Boolean {
+
+    if(dragSelectActive != active) {
+      dragToSelectListener?.invoke(active)
+    }
+
     if (active && dragSelectActive) {
       log("Drag selection is already active.")
       return false
@@ -155,7 +164,7 @@ class DragSelectTouchListener private constructor(
       return false
     }
 
-    if (!receiver.isIndexSelectable(initialSelection)) {
+    if (!receiver.isSelectable(initialSelection)) {
       this.dragSelectActive = false
       this.initialSelection = -1
       log("Index $initialSelection is not selectable.")
@@ -307,14 +316,14 @@ class DragSelectTouchListener private constructor(
     to: Int,
     min: Int,
     max: Int
-  ) = with(receiver) {
+  ) {
     if (from == to) {
       // Finger is back on the initial item, unselect everything else
       for (i in min..max) {
         if (i == from) {
           continue
         }
-        setSelected(i, false)
+        unselectItem(i)
       }
       return
     }
@@ -322,7 +331,7 @@ class DragSelectTouchListener private constructor(
     if (to < from) {
       // When selecting from one to previous items
       for (i in to..from) {
-        setSelected(i, true)
+        if(!selectItem(i)) break
       }
       if (min > -1 && min < to) {
         // Unselect items that were selected during this drag but no longer are
@@ -330,18 +339,18 @@ class DragSelectTouchListener private constructor(
           if (i == from) {
             continue
           }
-          setSelected(i, false)
+          unselectItem(i)
         }
       }
       if (max > -1) {
         for (i in from + 1..max) {
-          setSelected(i, false)
+          if(!selectItem(i)) break
         }
       }
     } else {
       // When selecting from one to next items
       for (i in from..to) {
-        setSelected(i, true)
+        if(!selectItem(i)) break
       }
       if (max > -1 && max > to) {
         // Unselect items that were selected during this drag but no longer are
@@ -349,14 +358,25 @@ class DragSelectTouchListener private constructor(
           if (i == from) {
             continue
           }
-          setSelected(i, false)
+          unselectItem(i)
         }
       }
       if (min > -1) {
         for (i in min until from) {
-          setSelected(i, false)
+          if(!selectItem(i)) break
         }
       }
     }
+  }
+
+  private fun selectItem(index: Int): Boolean =
+          if (receiver.isSelectable(index)) {
+            receiver.setSelected(index, true); true
+          } else {
+            onDragSelectionStop(); false
+          }
+
+  private fun unselectItem(index: Int) {
+    receiver.setSelected(index, false)
   }
 }
